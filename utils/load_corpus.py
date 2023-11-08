@@ -6,6 +6,8 @@ DATA_PATH = os.path.join('data')
 def load_corpus(folders=None):
     if folders is None:
         folders = [f for f in os.scandir(DATA_PATH) if f.is_dir()]
+    else:
+        folders = [f for f in os.scandir(DATA_PATH) if f.name in folders]
 
     corpus = ''
 

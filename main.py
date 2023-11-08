@@ -28,7 +28,7 @@ if __name__ == '__main__':
         config = yaml.safe_load(f)
 
     # load and preprocess corpus -------------------------------------------------------------
-    corpus = load_corpus()
+    corpus = load_corpus(folders=config['preprocessing']['folders'])
     print(f'\nSize corpus: {len(corpus)}')
     text_prepro = TextPreprocessor(config['preprocessing'])
     sentences = text_prepro.extract_sentences(corpus)

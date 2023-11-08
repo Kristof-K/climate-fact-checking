@@ -1,8 +1,8 @@
 import numpy as np
 import os
-from keras.models import Model
+from keras.models import Model, model_from_json
 from keras.layers import Input, LSTM, Dense
-from keras.models import model_from_json
+from keras.optimizers import RMSprop
 
 from models.masked_nlp_model import MaskedNLPModel
 from text_encoding.char_one_hot_encoder import CharOneHotEncoder
@@ -14,7 +14,8 @@ class CharToCharLSTM(MaskedNLPModel):
     # or as presented in: Lane, Hobson and Howard, Cole and Hapke, Hannes Max: Natural Language Processing in Action
 
     def __init__(self, text_encoder: CharOneHotEncoder, vocab_size: int, num_neurons: int,
-                 batch_size: int, epochs: int, save_epochs: int, validation_split: float):
+                 batch_size: int, epochs: int, save_epochs: int, validation_split: float,
+                 learning_rate: float):
         self.text_encoder = text_encoder
         self.vocab_size = vocab_size
         self.batch_size = batch_size
@@ -39,10 +40,11 @@ class CharToCharLSTM(MaskedNLPModel):
         decoder_out = decoder_dense(decoder_intermed)
 
         self.model_combined = Model(inputs=[encoder_in, decoder_in], outputs=decoder_out)
-        self.model_combined.compile(optimizer='rmsprop', loss='categorical_crossentropy')
+        optimizer = RMSprop(learning_rate=learning_rate)
+        self.model_combined.compile(optimizer=optimizer, loss='categorical_crossentropy')
         # store the encoder and decoder part separately for inference
         self.encoder = Model(inputs=encoder_in, outputs=encoder_states)
-        self.decoder = Model(inputs=[decoder_in, encoder_states],
+        self.decoder = Model(inputs=[decoder_in] + encoder_states,
                              outputs=[decoder_out, de_state_h, de_state_c])
 
     def train(self, samples_x: np.array, samples_y: np.array, samples_y_no_start: np.array,

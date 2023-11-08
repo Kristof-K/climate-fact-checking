@@ -7,4 +7,5 @@ def get_model(text_encoder: TextEncoder, vocab_size: int, config: dict):
         case 'CharToCharLSTM':
             return CharToCharLSTM(text_encoder, vocab_size, num_neurons=config['num_neurons'],
                                   batch_size=config['batch_size'], epochs=config['epochs'],
-                                  save_epochs=config['save_epochs'], validation_split=config['validation_split'])
+                                  save_epochs=config['save_epochs'], validation_split=config['validation_split'],
+                                  learning_rate=config["learning_rate"])

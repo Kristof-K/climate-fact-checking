@@ -1,6 +1,7 @@
 preprocessing:
+  folders: ["UnitedNations"]
   lower_case: True
-  min_words: 5
+  min_words: 1
   mask_symbol: "\r"
 encoding:
   word_based: False
@@ -10,13 +11,14 @@ encoding:
   start_token: "\t"
   end_token: "\n"
 model_training:
-  train: False
+  train: True
   model: "CharToCharLSTM"
-  epochs: 20
-  save_epochs: 5
+  epochs: 100
+  save_epochs: 100
+  learning_rate: 0.1
   batch_size: 64
-  num_neurons: 64
+  num_neurons: 256
   validation_split: 0.1
 load_model:
-  folder: "CharToCharLSTM_2023-11-07_15-41"
-  epoch: 20
+  folder: "CharToCharLSTM_2023-11-08_12-40"
+  epoch: 100

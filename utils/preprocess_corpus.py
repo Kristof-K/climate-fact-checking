@@ -16,6 +16,10 @@ class TextPreprocessor:
         # remove artifacts: citation numbers
         citation = r'\[\d+\]'
         corpus_modified = re.sub(citation, '', corpus)
+        # remove artifacts: html paragraphs
+        corpus_modified = re.sub(r'<p>', '\n', corpus_modified)
+        corpus_modified = re.sub(r'</p>', '\n', corpus_modified)
+        corpus_modified = re.sub(r'<br>', '', corpus_modified)
 
         if self.lower_case:
             corpus_modified = corpus_modified.lower()
