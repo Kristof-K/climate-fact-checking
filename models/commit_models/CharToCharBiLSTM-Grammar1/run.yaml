@@ -1,5 +1,5 @@
 preprocessing:
-  folders: ["SimulatedData2"]
+  folders: ["Grammar1"]
   lower_case: True
   min_words: 1
   mask_symbol: "\r"
@@ -7,7 +7,7 @@ encoding:
   word_based: False
   # if word_based True maximal number of words per statement,
   # otherwise maximal number of characters
-  max_seq_len: 20
+  max_seq_len: 10
   start_token: "\t"
   end_token: "\n"
 model_training:
@@ -17,7 +17,7 @@ model_training:
   save_epochs: 100
   learning_rate: 0.1
   batch_size: 64
-  num_neurons: 7
+  num_neurons: 16
   validation_split: 0.1
 load_model:
   folder: "CharToCharBiLSTM_2023-11-09_11-41"

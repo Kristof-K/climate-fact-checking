@@ -1,5 +1,5 @@
 preprocessing:
-  folders: ["SimulatedData2"]
+  folders: ["SimulatedData1"]
   lower_case: True
   min_words: 1
   mask_symbol: "\r"
@@ -7,7 +7,7 @@ encoding:
   word_based: False
   # if word_based True maximal number of words per statement,
   # otherwise maximal number of characters
-  max_seq_len: 20
+  max_seq_len: 40
   start_token: "\t"
   end_token: "\n"
 model_training:
