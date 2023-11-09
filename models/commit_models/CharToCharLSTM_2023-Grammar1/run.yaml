@@ -1,0 +1,24 @@
+preprocessing:
+  folders: ["Grammar1"]
+  lower_case: True
+  min_words: 1
+  mask_symbol: "\r"
+encoding:
+  word_based: False
+  # if word_based True maximal number of words per statement,
+  # otherwise maximal number of characters
+  max_seq_len: 10
+  start_token: "\t"
+  end_token: "\n"
+model_training:
+  train: True
+  model: "CharToCharLSTM"
+  epochs: 100
+  save_epochs: 100
+  learning_rate: 0.1
+  batch_size: 64
+  num_neurons: 32
+  validation_split: 0.1
+load_model:
+  folder: "CharToCharLSTM_2023-11-08_16-28"
+  epoch: 100
