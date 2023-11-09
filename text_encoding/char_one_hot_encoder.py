@@ -63,6 +63,14 @@ class CharOneHotEncoder(TextEncoder):
 
         return y_num, y_num_no_start
 
+    def encode_one_y(self, y: str):
+        if self.char_to_index == {}:
+            print('learn_and_encode() has to be invoked first', file=sys.stderr)
+
+        y_num = np.zeros((1, 1, self.vocab_size), dtype='float32')
+        y_num[0, 0, self.char_to_index[y]] = 1.0
+        return y_num
+
     def decode(self, model_output: np.array):
         if self.index_to_char == {}:
             print('learn_and_encode() has to be invoked first', file=sys.stderr)

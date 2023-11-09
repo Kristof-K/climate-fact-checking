@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import numpy as np
 
 
 class TextEncoder(ABC):
@@ -8,16 +9,21 @@ class TextEncoder(ABC):
         pass
 
     @abstractmethod
-    def learn_encoding(self, samples_x, samples_y):
+    def learn_encoding(self, samples_x: list[list[str]], samples_y: list[str]):
         pass
 
     @abstractmethod
-    def encode_x(self, samples_x):
-        pass
-
-    def encode_y(self, samples_y):
+    def encode_x(self, samples_x: list[list[str]]):
         pass
 
     @abstractmethod
-    def decode(self, model_output):
+    def encode_y(self, samples_y: list[str]):
+        pass
+
+    @abstractmethod
+    def encode_one_y(self, sample_y: str):
+        pass
+
+    @abstractmethod
+    def decode(self, model_output: np.array):
         pass

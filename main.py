@@ -66,5 +66,9 @@ if __name__ == '__main__':
         for k in range(len(masked_words)):
             # keep batch dimension by using [k] instead of k
             prob = model.get_token_probability(x_num[[k], :, :], masked_words[k])
-            most_likely, prob_ml = model.get_most_likely_word(x_num[[k], :, :])
-            print(f'{masked_words[k]} : {prob}\n vs. {most_likely} : {prob_ml}')
+            most_likely, prob_ml = model.get_most_likely_words(x_num[[k], :, :], n_beams=3)
+            print(f'{masked_words[k]} : {prob:.4f}')
+            print('vs. ', end='')
+            for l in range(3):
+                print(f'{most_likely[l]} : {prob_ml[l]:.4f}, ', end='')
+            print()

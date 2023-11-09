@@ -101,7 +101,7 @@ class CharToCharLSTM(MaskedNLPModel):
             thought = [h, c]
         return prob
 
-    def get_most_likely_word(self, x_num: np.array):
+    def get_most_likely_words(self, x_num: np.array, n_beams: int = 5):
         thought = self.encoder.predict(x_num, verbose=0)  # output + memory state
         target_seq = np.zeros((1, 1, self.vocab_size))
         # first element is start token

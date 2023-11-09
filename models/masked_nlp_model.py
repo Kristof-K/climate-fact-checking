@@ -16,7 +16,7 @@ class MaskedNLPModel(ABC):
         pass
 
     @abstractmethod
-    def get_most_likely_word(self, x_num: np.array):
+    def get_most_likely_words(self, x_num: np.array, n_beams: int):
         pass
 
     @abstractmethod
