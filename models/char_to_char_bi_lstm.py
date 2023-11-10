@@ -139,7 +139,8 @@ class CharToCharBiLSTM(MaskedNLPModel):
                 np.array([len(word) >= self.text_encoder.max_output for word in prev_words])
             )
 
-        return prev_words, prev_probs
+        order = np.argsort(-1.0 * prev_probs)      # return words sorted by likelihood
+        return [prev_words[s] for s in order], prev_probs[order]
 
     def get_next_k_char_prob(self, target_seq, thought, k):
         char_probs, h, c = self.decoder.predict([target_seq] + thought, verbose=0)

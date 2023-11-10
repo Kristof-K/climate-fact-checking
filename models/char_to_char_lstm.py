@@ -84,9 +84,8 @@ class CharToCharLSTM(MaskedNLPModel):
 
     def get_token_probability(self, x_num: np.array, masked_word: str):
         thought = self.encoder.predict(x_num, verbose=0)  # output + memory state
-        target_seq = np.zeros((1, 1, self.vocab_size))
         # first element is start token
-        target_seq[0, 0, self.text_encoder.char_to_index[self.text_encoder.start_token]] = 1.0
+        target_seq = self.text_encoder.encode_one_y(self.text_encoder.start_token)
 
         prob = 1.0
         for char in masked_word + self.text_encoder.stop_token:
@@ -96,35 +95,60 @@ class CharToCharLSTM(MaskedNLPModel):
             prob *= char_probs[0, -1, self.text_encoder.char_to_index[char]]
 
             # now look at next character
-            target_seq = np.zeros((1, 1, self.vocab_size))
-            target_seq[0, 0, self.text_encoder.char_to_index[char]] = 1.0
+            target_seq = self.text_encoder.encode_one_y(char)
             thought = [h, c]
         return prob
 
     def get_most_likely_words(self, x_num: np.array, n_beams: int = 5):
+        # use beam search to look for the approximately most likely words
         thought = self.encoder.predict(x_num, verbose=0)  # output + memory state
-        target_seq = np.zeros((1, 1, self.vocab_size))
         # first element is start token
-        target_seq[0, 0, self.text_encoder.char_to_index[self.text_encoder.start_token]] = 1.0
-        word = ''
-        new_char = self.text_encoder.start_token
-        prob = 1.0
+        target_seq = self.text_encoder.encode_one_y(self.text_encoder.start_token)
 
-        while len(word) <= self.text_encoder.max_output:
-            char_probs, h, c = self.decoder.predict([target_seq] + thought, verbose=0)
+        prev_chars, prev_probs, prev_thoughts = self.get_next_k_char_prob(target_seq, thought, n_beams)
+        all_finished = np.array([char == self.text_encoder.stop_token for char in prev_chars])
+        indices = np.arange(len(all_finished))
+        prev_words = prev_chars
 
-            # multiply probabilities of corresponding characters in the masked word
-            max_index = np.argmax(char_probs[0, 0, :])
-            new_char = self.text_encoder.index_to_char[max_index]
-            prob *= char_probs[0, 0, max_index]
+        while not np.all(all_finished):
+            col_chars = [prev_chars[i] for i in indices[all_finished]]
+            col_probs = prev_probs[indices[all_finished]]
+            col_thoughts = [prev_thoughts[i] for i in indices[all_finished]]
+            col_words = [prev_words[i] for i in indices[all_finished]]
 
-            if new_char == self.text_encoder.stop_token:
-                break
-            word += new_char
+            # get the next candidates
+            for i in indices[np.bitwise_not(all_finished)]:
+                add_chars, mult_probs, add_thoughts = self.get_next_k_char_prob(
+                    self.text_encoder.encode_one_y(prev_chars[i]), prev_thoughts[i], n_beams
+                )
+                col_chars += add_chars
+                col_words += [prev_words[i] + char if char != self.text_encoder.stop_token else prev_words[i]
+                              for char in add_chars]
+                col_probs = np.hstack((col_probs, prev_probs[i] * mult_probs))
+                col_thoughts += add_thoughts
 
-            # now look at next character
-            target_seq = np.zeros((1, 1, self.vocab_size))
-            target_seq[0, 0, self.text_encoder.char_to_index[new_char]] = 1.0
-            thought = [h, c]
-        return word, prob
+            # filter for the k best candidates
+            k_largest = np.argsort(-1.0 * col_probs)[:n_beams]
 
+            prev_chars = [col_chars[s] for s in k_largest]
+            prev_words = [col_words[s] for s in k_largest]
+            prev_probs = col_probs[k_largest]
+            prev_thoughts = [col_thoughts[s] for s in k_largest]
+            all_finished = np.bitwise_or(
+                np.array([char == self.text_encoder.stop_token for char in prev_chars]),
+                np.array([len(word) >= self.text_encoder.max_output for word in prev_words])
+            )
+
+        order = np.argsort(-1.0 * prev_probs)  # return words sorted by likelihood
+        return [prev_words[s] for s in order], prev_probs[order]
+
+    def get_next_k_char_prob(self, target_seq, thought, k):
+        char_probs, h, c = self.decoder.predict([target_seq] + thought, verbose=0)
+
+        k_largest = np.argsort(-1.0 * char_probs[0, 0, :])[:k]
+
+        new_chars = [self.text_encoder.index_to_char[i] for i in k_largest]
+        probs = char_probs[0, 0, k_largest]
+        new_thoughts = [[h, c]] * k
+
+        return new_chars, probs, new_thoughts
