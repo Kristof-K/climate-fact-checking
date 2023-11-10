@@ -26,6 +26,10 @@ class CharOneHotEncoder(TextEncoder):
         chars.append(self.mask_symbol)
         chars.append(self.start_token)
         chars.append(self.stop_token)
+        if '"' in chars and '`' not in chars:       # nltk.word_tokenize changes double quotes
+            chars.append('`')
+        if '"' in chars and '\'' not in chars:      # into backward and forward quotes
+            chars.append('\'')
         chars = sorted(chars)
 
         self.char_to_index = dict((c, i) for i, c in enumerate(chars))

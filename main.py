@@ -42,7 +42,7 @@ def get_training_data_generator(sentences, batch_size, text_prepro, text_embeddi
     )
     while True:
         # due to the masked training we get more samples than what we processed
-        yield x_num[:batch_size], y_num[:batch_size], y_num_no_start[:batch_size]
+        yield (x_num[:batch_size], y_num[:batch_size]), y_num_no_start[:batch_size]
         x_num_prev = x_num[batch_size:]
         y_num_prev = y_num[batch_size:]
         y_num_no_start_prev = y_num_no_start[batch_size:]
