@@ -9,7 +9,7 @@ class TextEncoder(ABC):
         pass
 
     @abstractmethod
-    def learn_encoding(self, samples_x: list[list[str]], samples_y: list[str]):
+    def learn_encoding(self, sentences: list[str]):
         pass
 
     @abstractmethod

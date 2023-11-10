@@ -5,10 +5,15 @@ import os
 
 
 class MaskedNLPModel(ABC):
+    # abstract class all models should inherit
 
     @abstractmethod
     def train(self, samples_x: np.array, samples_y: np.array, samples_y_no_start: np.array,
               path: str):
+        pass
+
+    @abstractmethod
+    def train_generator(self, generator, steps: int, path: str):
         pass
 
     @abstractmethod
@@ -26,10 +31,8 @@ class MaskedNLPModel(ABC):
     @staticmethod
     def print_loss(loss_vals: dict, path: str):
         plt.plot(loss_vals['loss'])
-        plt.plot(loss_vals['val_loss'])
         plt.title('Loss Values')
         plt.ylabel('loss')
         plt.xlabel('epoch')
-        plt.legend(['train', 'test'], loc='upper right')
         plt.tight_layout()
         plt.savefig(os.path.join(path, 'loss.png'))

@@ -8,5 +8,8 @@ def get_encoder(config):
         return None
     else:
         return CharOneHotEncoder(max_seq_length=config['max_seq_len'],
+                                 max_output=config['max_output'],
                                  start_token=config['start_token'],
-                                 stop_token=config['end_token'])
+                                 stop_token=config['end_token'],
+                                 mask_symbol=config['mask_symbol'])
+
