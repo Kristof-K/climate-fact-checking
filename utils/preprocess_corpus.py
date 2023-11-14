@@ -53,6 +53,18 @@ class TextPreprocessor:
         print("Quantiles:", q_levels)
         print(np.quantile(lengths, q=q_levels))
 
+    def tokenize_sentences(self, sentences: list[str]):
+        tokenized_sentences = []
+
+        for sent in sentences:
+            word_tokens = word_tokenize(sent)
+
+            if len(word_tokens) < self.min_words:
+                continue
+            tokenized_sentences.append(word_tokens)
+
+        return tokenized_sentences
+
     def get_masked_word_tokens(self, sentences: list[str]):
         masked_sentences = []
         masked_word = []

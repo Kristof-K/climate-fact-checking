@@ -38,7 +38,7 @@ class CharOneHotEncoder(TextEncoder):
 
     def encode_x(self, samples_x: list[list[str]]):
         if self.char_to_index == {}:
-            print('learn_and_encode() has to be invoked first', file=sys.stderr)
+            print('learn_encoding() has to be invoked first', file=sys.stderr)
 
         # throw out too long samples
         indices = [i for i in range(len(samples_x)) if len(' '.join(samples_x[i])) <= self.max_seq_length]
@@ -51,21 +51,19 @@ class CharOneHotEncoder(TextEncoder):
 
     def encode_y(self, samples_y: list[str]):
         if self.char_to_index == {}:
-            print('learn_and_encode() has to be invoked first', file=sys.stderr)
+            print('learn_encoding() has to be invoked first', file=sys.stderr)
 
         y_num = np.zeros((len(samples_y), self.max_output, self.vocab_size), dtype='float32')
-        y_num_no_start = np.zeros((len(samples_y), self.max_output, self.vocab_size), dtype='float32')
 
         for i, word_token in enumerate(samples_y):
             for t, char in enumerate((self.start_token + word_token + self.stop_token)):
                 y_num[i, t, self.char_to_index[char]] = 1.0
-        y_num_no_start[:, :-1, :] = y_num[:, 1:, :]        # just forget the start token
 
-        return y_num, y_num_no_start
+        return y_num
 
     def encode_one_y(self, y: str):
         if self.char_to_index == {}:
-            print('learn_and_encode() has to be invoked first', file=sys.stderr)
+            print('learn_encoding() has to be invoked first', file=sys.stderr)
 
         y_num = np.zeros((1, 1, self.vocab_size), dtype='float32')
         y_num[0, 0, self.char_to_index[y]] = 1.0
@@ -73,6 +71,6 @@ class CharOneHotEncoder(TextEncoder):
 
     def decode(self, model_output: np.array):
         if self.index_to_char == {}:
-            print('learn_and_encode() has to be invoked first', file=sys.stderr)
+            print('learn_encoding() has to be invoked first', file=sys.stderr)
 
         return self.index_to_char[np.argmax(model_output, axis=0)]

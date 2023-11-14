@@ -11,27 +11,34 @@ class MaskedChartoChar(MaskedNLPModel):
     # the encoder and decoder element and the joint model for training
 
     def __init__(self, model: Model, encoder: Model, decoder: Model, text_encoder: CharOneHotEncoder,
-                 vocab_size: int, batch_size: int, epochs: int, save_epochs: int):
+                 batch_size: int, epochs: int, save_epochs: int):
         self.model = model
         self.encoder = encoder
         self.decoder = decoder
         self.text_encoder = text_encoder
 
-        self.vocab_size = vocab_size
+        self.vocab_size = text_encoder.get_vocab_size()
         self.batch_size = batch_size
         self.epochs = epochs
         self.save_epochs = save_epochs
 
-    def train(self, samples_x: np.array, samples_y: np.array, samples_y_no_start: np.array,
-              path: str):
-        self.train_comb(path=path, samples_x=samples_x, samples_y=samples_y,
-                        samples_y_no_start=samples_y_no_start)
+    def train(self, samples_x: np.array, samples_y: np.array, path: str):
+        self.train_comb(path=path, samples_x=samples_x, samples_y=samples_y)
 
-    def train_generator(self, generator, steps:int, path: str):
+    def train_generator(self, generator, steps: int, path: str):
         self.train_comb(path=path, generator=generator, steps=steps)
 
+    @staticmethod
+    def _wrap_generator(data_generator):
+        for x_num, y_num in data_generator:
+            # our actual learning targets are the shifted y-values as we are using them also as input
+            y_num_no_start = np.zeros_like(y_num)
+            y_num_no_start[:, :-1, :] = y_num[:, 1:, :]     # just forget the start token
+
+            yield (x_num, y_num), y_num_no_start
+
     def train_comb(self, path: str, samples_x: np.array = None, samples_y: np.array = None,
-                   samples_y_no_start: np.array = None, generator=None, steps: int = None):
+                   generator=None, steps: int = None):
         # either generator and steps should be given or all three samples_*
 
         # save model structure
@@ -46,9 +53,14 @@ class MaskedChartoChar(MaskedNLPModel):
         loss_vals = dict([('loss', [])])
         while i < self.epochs:
             if generator is not None:
-                history = self.model.fit(x=generator, batch_size=self.batch_size,
-                                         epochs=self.save_epochs, steps_per_epoch=steps)
+                history = self.model.fit(x=MaskedChartoChar._wrap_generator(generator),
+                                         batch_size=self.batch_size, epochs=self.save_epochs,
+                                         steps_per_epoch=steps)
             else:
+                # we are trying to learn y sequentially: one after the other (+ teacher forcing)
+                samples_y_no_start = np.zeros_like(samples_y)
+                samples_y_no_start[:, :-1, :] = samples_y[:, 1:, :]  # just forget the start token
+
                 history = self.model.fit(x=[samples_x, samples_y], y=samples_y_no_start,
                                          batch_size=self.batch_size, epochs=self.save_epochs)
             i += self.save_epochs
@@ -92,7 +104,7 @@ class MaskedChartoChar(MaskedNLPModel):
         # first element is start token
         target_seq = self.text_encoder.encode_one_y(self.text_encoder.start_token)
 
-        prev_chars, prev_probs, prev_thoughts = self.get_next_k_char_prob(target_seq, thought, n_beams)
+        prev_chars, prev_probs, prev_thoughts = self._get_next_k_char_prob(target_seq, thought, n_beams)
         all_finished = np.array([char == self.text_encoder.stop_token for char in prev_chars])
         indices = np.arange(len(all_finished))
         prev_words = prev_chars
@@ -105,7 +117,7 @@ class MaskedChartoChar(MaskedNLPModel):
 
             # get the next candidates
             for i in indices[np.bitwise_not(all_finished)]:
-                add_chars, mult_probs, add_thoughts = self.get_next_k_char_prob(
+                add_chars, mult_probs, add_thoughts = self._get_next_k_char_prob(
                     self.text_encoder.encode_one_y(prev_chars[i]), prev_thoughts[i], n_beams
                 )
                 col_chars += add_chars
@@ -129,7 +141,7 @@ class MaskedChartoChar(MaskedNLPModel):
         order = np.argsort(-1.0 * prev_probs)      # return words sorted by likelihood
         return [prev_words[s] for s in order], prev_probs[order]
 
-    def get_next_k_char_prob(self, target_seq, thought, k):
+    def _get_next_k_char_prob(self, target_seq, thought, k):
         char_probs, h, c = self.decoder.predict([target_seq] + thought, verbose=0)
 
         k_largest = np.argsort(-1.0 * char_probs[0, 0, :])[:k]

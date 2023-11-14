@@ -3,28 +3,28 @@ preprocessing:
             "TheNewYorkTimes", "NationalOceanicAndAtmosphericAdministration"]
   lower_case: True
   min_words: 5
-  mask_symbol: "<mask>"
+  mask_symbol: "\r"
 encoding:
-  word_based: True
+  word_based: False
   # if word_based True maximal number of words per statement,
   # otherwise maximal number of characters
-  max_seq_len: 30
+  max_seq_len: 200
   # if word_based True size of output vocabulary, otherwise
   # maximal output sequence length
-  max_output: 3000
+  max_output: 30
   # both tokens only important for character based encoding (word based False)
   start_token: "\t"
   end_token: "\n"
 model_training:
-  train: False
+  train: True
   use_generator: True
-  model: "WordvecToWordLSTM"
-  epochs: 10
+  model: "CharToCharBiLSTM"
+  epochs: 25
   # save model weights every save_epochs iterations
   save_epochs: 5
   learning_rate: 0.1
   batch_size: 64
-  num_neurons: 512
+  num_neurons: 256
 load_model:
-  folder: "WordvecToWordLSTM_2023-11-14_17-27"
+  folder: "CharToCharBiLSTM_2023-11-10_14-53"
   epoch: 5

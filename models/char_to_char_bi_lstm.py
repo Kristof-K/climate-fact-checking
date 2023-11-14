@@ -11,8 +11,9 @@ class CharToCharBiLSTM(MaskedChartoChar):
     # https://blog.keras.io/a-ten-minute-introduction-to-sequence-to-sequence-learning-in-keras.html
     # or as presented in: Lane, Hobson and Howard, Cole and Hapke, Hannes Max: Natural Language Processing in Action
 
-    def __init__(self, text_encoder: CharOneHotEncoder, vocab_size: int, num_neurons: int,
+    def __init__(self, text_encoder: CharOneHotEncoder, num_neurons: int,
                  batch_size: int, epochs: int, save_epochs: int, learning_rate: float):
+        vocab_size = text_encoder.get_vocab_size()
         # define Network structure
         # encoder encodes input sequence of arbitrary length (dimension None!)
         encoder_in = Input(shape=(None, vocab_size))
@@ -37,5 +38,5 @@ class CharToCharBiLSTM(MaskedChartoChar):
         decoder = Model(inputs=[decoder_in] + encoder_states,
                         outputs=[decoder_out, de_state_h, de_state_c])
 
-        super().__init__(model_combined, encoder, decoder, text_encoder, vocab_size=vocab_size,
+        super().__init__(model_combined, encoder, decoder, text_encoder,
                          batch_size=batch_size, epochs=epochs, save_epochs=save_epochs)

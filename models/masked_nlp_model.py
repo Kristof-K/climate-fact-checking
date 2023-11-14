@@ -8,8 +8,7 @@ class MaskedNLPModel(ABC):
     # abstract class all models should inherit
 
     @abstractmethod
-    def train(self, samples_x: np.array, samples_y: np.array, samples_y_no_start: np.array,
-              path: str):
+    def train(self, samples_x: np.array, samples_y: np.array, path: str):
         pass
 
     @abstractmethod
