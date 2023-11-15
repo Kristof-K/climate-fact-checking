@@ -20,34 +20,44 @@ class CharOneHotEncoder(TextEncoder):
     def get_vocab_size(self):
         return self.vocab_size
 
-    def learn_encoding(self, sentences: list[str]):
+    def learn_encoding(self, sentences: list[list[str]]):
         # determine list of all used characters
-        chars = list(set(' '.join(sentences)))
+        chars = list(set(''.join([''.join(sent) for sent in sentences])))
+        chars.append(' ')
         chars.append(self.mask_symbol)
         chars.append(self.start_token)
         chars.append(self.stop_token)
-        if '"' in chars and '`' not in chars:       # nltk.word_tokenize changes double quotes
-            chars.append('`')
-        if '"' in chars and '\'' not in chars:      # into backward and forward quotes
-            chars.append('\'')
         chars = sorted(chars)
 
         self.char_to_index = dict((c, i) for i, c in enumerate(chars))
         self.index_to_char = dict((i, c) for i, c in enumerate(chars))
         self.vocab_size = len(chars)
 
+    def _check_word(self, word: str):
+        # each character of the word is contained in our vocabulary
+        return np.all(np.array([char in self.char_to_index.keys() for char in word]))
+
+    def filter_samples(self, sentences: list[list[str]]):
+        if self.char_to_index == {}:
+            print('learn_encoding() has to be invoked first', file=sys.stderr)
+
+        # check whether sentence is not too long and all words are contained in our vocabulary
+        all_fine = np.array([len(' '.join(sent)) <= self.max_seq_length and
+                             np.all([self._check_word(w) for w in sent])
+                             for sent in sentences])
+        print(f'{all_fine.mean() * 100:.2f}% are suitable for training')
+        return [sentences[i] for i in np.arange(len(sentences))[all_fine]]
+
     def encode_x(self, samples_x: list[list[str]]):
         if self.char_to_index == {}:
             print('learn_encoding() has to be invoked first', file=sys.stderr)
 
-        # throw out too long samples
-        indices = [i for i in range(len(samples_x)) if len(' '.join(samples_x[i])) <= self.max_seq_length]
-        x_num = np.zeros((len(indices), self.max_seq_length, self.vocab_size), dtype='float32')
+        x_num = np.zeros((len(samples_x), self.max_seq_length, self.vocab_size), dtype='float32')
 
-        for i, index in enumerate(indices):
-            for t, char in enumerate(' '.join(samples_x[index])):
+        for i, sample in enumerate(samples_x):
+            for t, char in enumerate(' '.join(sample)):
                 x_num[i, t, self.char_to_index[char]] = 1.0
-        return x_num, indices
+        return x_num
 
     def encode_y(self, samples_y: list[str]):
         if self.char_to_index == {}:

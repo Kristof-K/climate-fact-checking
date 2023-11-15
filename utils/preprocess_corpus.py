@@ -45,13 +45,16 @@ class TextPreprocessor:
         return sentences
 
     @staticmethod
-    def analyze_sentence_lengths(sentences: list[str]):
-        lengths = np.array([len(s) for s in sentences])
-        print("\nSentence length distribution:")
+    def _analyze_lengths(lengths: np.array, desc: str, q_levels: np.array = np.array([0.1, 0.25, 0.5, 0.75, 0.9])):
+        print(f"\n{desc} length distribution:")
         print(f"Min:  {lengths.min()}\nMean: {lengths.mean()}\nMax:  {lengths.max()}")
-        q_levels = np.array([0.1, 0.25, 0.5, 0.75, 0.9])
         print("Quantiles:", q_levels)
         print(np.quantile(lengths, q=q_levels))
+
+    @staticmethod
+    def analyze_sentence_lengths(sentences: list[str]):
+        lengths = np.array([len(s) for s in sentences])
+        TextPreprocessor._analyze_lengths(lengths, "Sentence")
 
     def tokenize_sentences(self, sentences: list[str]):
         tokenized_sentences = []
@@ -63,15 +66,20 @@ class TextPreprocessor:
                 continue
             tokenized_sentences.append(word_tokens)
 
+        TextPreprocessor.analyze_word_lengths(tokenized_sentences)
         return tokenized_sentences
 
-    def get_masked_word_tokens(self, sentences: list[str]):
+    @staticmethod
+    def analyze_word_lengths(sentences: list[list[str]]):
+        # sum appends all lists contained in sentences
+        lengths = np.array([len(w) for w in sum(sentences, [])])
+        TextPreprocessor._analyze_lengths(lengths, "Word")
+
+    def get_masked_word_tokens(self, sentences_tokenized: list[list[str]]):
         masked_sentences = []
         masked_word = []
 
-        for sent in sentences:
-            word_tokens = word_tokenize(sent)
-
+        for word_tokens in sentences_tokenized:
             if len(word_tokens) < self.min_words:
                 continue
             # iterate through word tokens and mask each one out

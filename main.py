@@ -26,8 +26,8 @@ def create_folder(model_name: str):
 
 def get_all_training_data(sentences, text_prepro, text_embedding):
     masked_statements, masked_words = text_prepro.get_masked_word_tokens(sentences)
-    x_num, indices = text_embedding.encode_x(masked_statements)
-    y_num = text_embedding.encode_y([masked_words[i] for i in indices])
+    x_num = text_embedding.encode_x(masked_statements)
+    y_num = text_embedding.encode_y(masked_words)
 
     return x_num, y_num
 
@@ -50,9 +50,7 @@ def get_training_data_generator(sentences, batch_size, text_prepro, text_embeddi
             # process next batch
             i_sent = (i_sent + batch_size) % n_sent
             new_indices = (i_sent + np.arange(batch_size)) % n_sent
-            x_num, y_num = get_all_training_data(
-                [sentences[i] for i in new_indices], text_prepro, text_embedding
-            )
+            x_num, y_num = get_all_training_data([sentences[i] for i in new_indices], text_prepro, text_embedding)
             x_num = np.vstack((x_num_prev, x_num))
             y_num = np.vstack((y_num_prev, y_num))
         else:
@@ -69,11 +67,13 @@ if __name__ == '__main__':
     print(f'\nSize corpus: {len(corpus)}')
     text_prepro = TextPreprocessor(config['preprocessing'])
     sentences = text_prepro.extract_sentences(corpus)
+    sentences = text_prepro.tokenize_sentences(sentences)
 
     # encode text by word_embedding or character/word one hot encoding -----------------------
     config['encoding']['mask_symbol'] = config['preprocessing']['mask_symbol']
     text_embedding = get_encoder(config['encoding'])
     text_embedding.learn_encoding(sentences)
+    sentences = text_embedding.filter_samples(sentences)
 
     # train or load the model ----------------------------------------------------------------
     model = get_model(text_embedding, config['model_training'])
@@ -100,11 +100,9 @@ if __name__ == '__main__':
 
     for i in pick:
         masked_statements, masked_words = text_prepro.get_masked_word_tokens([sentences[i]])
-        x_num, indices = text_embedding.encode_x(masked_statements)
-        masked_words = [masked_words[l] for l in indices]
-        if not indices:      # sentences were too long
-            continue
-        print(f'\n\n#{i}\n{sentences[i]}\n')
+        x_num = text_embedding.encode_x(masked_statements)
+
+        print(f'\n\n#{i}\n{" ".join(sentences[i])}\n')
         for k in range(len(masked_words)):
             # keep batch dimension by using [k] instead of k
             prob = model.get_token_probability(x_num[[k], :, :], masked_words[k])

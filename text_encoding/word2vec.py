@@ -38,21 +38,27 @@ class MyWord2Vec(TextEncoder):
         self.word_to_index = dict((c, i) for i, c in enumerate(words))
         self.index_to_word = dict((i, c) for i, c in enumerate(words))
 
+    def filter_samples(self, sentences: list[list[str]]):
+        if self.word_vectors is None:
+            print('learn_encoding() has to be invoked first', file=sys.stderr)
+
+        # check whether sentence is short enough and all words are contained in our vocabulary
+        all_fine = np.array([len(tokens) <= self.max_seq_length and
+                             np.all(np.array([token in self.word_to_index.keys() for token in tokens]))
+                             for tokens in sentences])
+        print(f'{all_fine.mean() * 100:.2f}% of the sentences are suitable or training')
+        return [sentences[i] for i in np.arange(len(sentences))[all_fine]]
+
     def encode_x(self, samples_x: list[list[str]]):
         if self.word_vectors is None:
             print('learn_encoding() has to be invoked first', file=sys.stderr)
 
-        # throw out too long samples
-        indices = [i for i in range(len(samples_x)) if len(samples_x[i]) <= self.max_seq_length]
-        x_num = np.zeros((len(indices), self.max_seq_length, self.vec_dim), dtype='float32')
+        x_num = np.zeros((len(samples_x), self.max_seq_length, self.vec_dim), dtype='float32')
 
-        for i, index in enumerate(indices):
-            for t, word in enumerate(samples_x[index]):
-                # what to do with words that are not in the embedding?
-                if word not in self.word_to_index.keys():
-                    continue
+        for i, sample in enumerate(samples_x):
+            for t, word in enumerate(sample):
                 x_num[i, t, :] = self.word_vectors[word]
-        return x_num, indices
+        return x_num
 
     def encode_y(self, samples_y: list[str]):
         if self.word_vectors is None:

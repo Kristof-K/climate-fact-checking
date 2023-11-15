@@ -9,7 +9,11 @@ class TextEncoder(ABC):
         pass
 
     @abstractmethod
-    def learn_encoding(self, sentences: list[str]):
+    def learn_encoding(self, sentences: list[list[str]]):
+        pass
+
+    @abstractmethod
+    def filter_samples(self, sentences: list[list[str]]):
         pass
 
     @abstractmethod

@@ -16,13 +16,13 @@ encoding:
   start_token: "\t"
   end_token: "\n"
 model_training:
-  train: False
-  use_generator: True
+  train: True
+  use_generator: False
   model: "WordvecToWordLSTM"
-  epochs: 10
+  epochs: 50
   # save model weights every save_epochs iterations
-  save_epochs: 5
-  learning_rate: 0.1
+  save_epochs: 10
+  learning_rate: 0.01
   batch_size: 64
   num_neurons: 512
 load_model:
