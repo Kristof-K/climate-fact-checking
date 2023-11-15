@@ -1,0 +1,102 @@
+Climate Milestone: Earth's CO2 Level Passes 400 ppm
+Today, greenhouse gasses in Earth's atmosphere are at their highest since the Pliocene Era, when sea levels were higher and Earth was warmer.
+
+GRADES
+4 - 12
+
+SUBJECTS
+Chemistry, Climatology, Conservation
+
+PHOTOGRAPH
+
+Scripps CO2 2019
+This graph visualizes data from the Scripps carbon dioxide (CO2) measurements recorded at the Mauna Loa Observatory.
+
+IMAGE BY THE SCRIPPS INSTITUTION OF OCEANOGRAPHY
+
+Scripps CO2 2019
+Scripps CO2 2019PHOTOGRAPH
+Scripps Keeling CurvePHOTOGRAPH
+Leveled by
+Newsela
+
+
+
+
+Selected text level
+ARTICLEVOCABULARY
+On May 9, 2013, an instrument near the summit of Mauna Loa in Hawai'i, United States, recorded a long-awaited climate milestone: the amount of carbon dioxide (CO2)in the atmosphere there had exceeded 400 parts per million (ppm) for the first time in 55 years of measurement—and probably more than thre million years of Earth history.
+
+The last time the concentration of Earth's main greenhouse gas reached this mark, horses and camels lived in the high Arctic. Seas were at least 9.1 meters (30 feet higher)—at a level that today would inundate major cities around the world.
+
+The planet was about 2 to 3 degrees Celsius (3.6 to 5.4 degrees Fahrenheit) warmer. But Earth then was in the final stage of a prolonged greenhouse epoch, and CO2 concentrations were on their way down. However, the May 2013 reading represented something different. This time, 400 ppm was a milepost on a far more rapid uphill climb toward an uncertain climate future.
+
+Two independent teams of scientists measure CO2 on Mauna Loa: one from the U.S. National Oceanic and Atmospheric Administration (NOAA), the other from the Scripps Institution of Oceanography. The NOAA team was the first to post word on its website: The daily average for May 9 was 400.03 ppm. The Scripps team later confirmed the milestone had been crossed.
+
+The Scripps team was led by Ralph Keeling, son of the late Charles David Keeling, who started the Mauna Loa measurements in 1958. Since then the "Keeling curve," showing the steady climb in CO2 levels caused primarily by burning fossil fuels, has become an icon of climate change.
+
+When the elder Keeling started at Mauna Loa, the CO2 level was at 315 ppm. When he died in June 2005, it was at 382. Why did he keep at it for 47 years, fighting off periodic efforts to cut his funding? His father, he once wrote, had passed onto him a "faith that the world could be made better by devotion to just causes." Now his son and the NOAA team have taken over a measurement that captures, more than any other single number, the extent to which we are changing the world.
+
+Setting the Record Straight
+
+The CO2 level had been hovering above 399 ppm since late April, 2013. The Scripps lab opened the vigil to the public by sending out daily tweets (under the handle @Keeling_curve) almost as soon as the data could be downloaded from Mauna Loa, at 5 a.m. Hawai'i time. NOAA took to updating its website daily. The two labs' measurements typically agree within 0.2 ppm. Both measure the amount of CO2 in an air sample by measuring how much infrared radiation it absorbs—the same process by which CO2 in the atmosphere traps heat and warms the whole planet.
+
+The measurement NOAA reported for Thursday, May 9, 400.03 ppm, was for a single day. Each data point on the Keeling curve, however, is actually an average of all the measurements made at Mauna Loa over an entire month. Just under a year later, April 2014 marked the first time the monthly average CO2 level was measured at 400 ppm at Mauna Loa. In 2016, an even more significant milestone was reached: The global annual minimum levels of CO2 in the atmosphere measured above 400 ppm.
+
+To understand the significance of this milestone, it is necessary to understand that atmospheric CO2 levels are cyclical, with annual maximums and minimums. CO2 peaks in May every year. By June the levels begin falling, as spring kicks into high gear in the Northern Hemisphere, where most of the planet's land is concentrated, and plants draw CO2 out of the atmosphere to fuel their new growth. By November, the CO2 level is typically five or six ppm lower than its spring levels
+
+Then the curve turns upward again: In the winter, plants stop making new carbohydrates but continue to burn the old, respiring CO2 back into the atmosphere.
+
+This seasonal sawtooth—think of it as the breath of northern forests—is the natural part of the Keeling curve. The artificial part is its steady upward climb from one year to the next. Both were discovered at Mauna Loa.
+
+Dave Keeling, as he was known, chose the Hawaiian mountain for his measurements because, at over 3,353 meters (11,000 feet) and in the middle of the Pacific, it is far from forests or smokestacks that might put a local bias on the data. But even Mauna Loa is not perfectly representative of the whole planet.
+
+NOAA also monitors CO2 at a global network of stations, and the global average consistently lags the Mauna Loa number by a few parts per million—for a simple reason.
+
+"Mauna Loa is higher because most of the fossil fuel CO2 is emitted in the Northern Hemisphere," NOAA scientist Pieter Tans says. It takes about a year, he says, for northern pollution to spread through the Southern Hemisphere.
+
+On the other hand, Mauna Loa lags the Arctic, where CO2 levels are higher. A year before the historic measurements were recorded at Mauna Loa, NOAA reported that the average of its Arctic measurements had exceeded 400 ppm for the entire month of May, not just for a single day.
+
+The rest of the planet soon caught up with Mauna Loa’s measurements. By 2015, the annual global average CO2 levels exceeded 400 ppm. What does passing this threshold mean?
+
+Back to the Pliocene?
+
+In a way, 400 ppm is an arbitrary milestone, like a .400 batting average in baseball. But the fact that no one has batted .400 since Ted Williams in 1941 still says something important about baseball. The same goes for CO2 in Earth's atmosphere.
+
+The last time the concentration of CO2 was as high as 400 ppm was probably in the Pliocene Epoch, between 2.6 million and 5.3 million years ago. Until the 20th century, it certainly hadn't exceeded 300 ppm, let alone 400 ppm, for at least 800,000 years. That's how far back scientists have been able to measure CO2 directly in bubbles of ancient air trapped in Antarctic ice cores.
+
+But tens of millions of years ago, CO2 must have been much higher than it is now—there's no other way to explain how warm Earth was then. In the Eocene, some 50 million years ago, there were alligators and tapirs on Ellesmere Island, which lies off northern Greenland in the Canadian Arctic. They were living in swampy forests like those in the southeastern United States today. CO2 may have been anywhere from two to 10 times higher in the Eocene than it is today.
+
+On April 18, 2017, Mauna Loa observatory recorded a new record. For the first time, CO2 level were measured at over 410 ppm.
+
+carbohydrate
+Noun
+type of sugar that is an important nutrient for most organisms.
+
+carbon dioxide
+Noun
+greenhouse gas produced by animals during respiration and used by plants during photosynthesis. Carbon dioxide is also the byproduct of burning fossil fuels.
+
+climate change
+Noun
+gradual changes in all the interconnected weather elements on our planet.
+
+fossil fuel
+Noun
+coal, oil, or natural gas. Fossil fuels formed from the remains of ancient plants and animals.
+
+global warming
+Noun
+increase in the average temperature of the Earth's air and oceans.
+
+greenhouse gas
+Noun
+gas in the atmosphere, such as carbon dioxide, methane, water vapor, and ozone, that absorbs solar heat reflected by the surface of the Earth, warming the atmosphere.
+
+ice core
+Noun
+sample of ice taken to demonstrate changes in climate over many years.
+
+parts per million (ppm)
+Plural Noun
+A unit of measure of the amount of dissolved solids in a solution in terms of a ratio between the number of parts 

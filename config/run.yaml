@@ -16,7 +16,7 @@ encoding:
   start_token: "\t"
   end_token: "\n"
 model_training:
-  train: True
+  train: False
   use_generator: True
   model: "CharToCharBiLSTM"
   epochs: 10
@@ -26,5 +26,5 @@ model_training:
   batch_size: 64
   num_neurons: 256
 load_model:
-  folder: "CharToCharBiLSTM_2023-11-10_14-53"
-  epoch: 5
+  folder: "WordvecToWordLSTM_2023-11-15_11-42"
+  epoch: 20
