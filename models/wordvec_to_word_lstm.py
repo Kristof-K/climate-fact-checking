@@ -2,11 +2,11 @@ from keras.models import Model
 from keras.layers import Input, LSTM, Dense
 from keras.optimizers import RMSprop
 
-from models.simple_word_nlp_model import SimpleWordPrediction
+from models.masked_word_nlp_model import MaskedWordModel
 from text_encoding.word2vec import MyWord2Vec
 
 
-class WordvecToWordLSTM(SimpleWordPrediction):
+class WordvecToWordLSTM(MaskedWordModel):
     # Use LSTM layers to process sentences encoded by word embeddings, and use Dense softmax
     # learn distribution over masked words
 

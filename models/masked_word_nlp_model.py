@@ -6,7 +6,7 @@ from models.masked_nlp_model import MaskedNLPModel
 from text_encoding.word2vec import MyWord2Vec
 
 
-class SimpleWordPrediction(MaskedNLPModel):
+class MaskedWordModel(MaskedNLPModel):
 
     def __init__(self, model: Model, text_encoder: MyWord2Vec, batch_size: int, epochs: int,
                  save_epochs: int):
@@ -57,10 +57,13 @@ class SimpleWordPrediction(MaskedNLPModel):
     def get_token_probability(self, x_num: np.array, masked_word: str):
         probs = self.model.predict(x_num, verbose=0)
 
-        return probs[0, self.text_encoder.word_to_index[masked_word]]
+        if masked_word in self.text_encoder.word_vectors:
+            return probs[0, self.text_encoder.word_to_index[masked_word]]
+        # else return negative number
+        return -1.0
 
     def get_most_likely_words(self, x_num: np.array, n_beams: int = 5):
         probs = self.model.predict(x_num, verbose=0)
-        k_largest = np.argsort(-1.0 * probs[0, 0, :])[:n_beams]
+        k_largest = np.argsort(-1.0 * probs[0, :])[:n_beams]
 
-        return [self.text_encoder.index_to_word[k] for k in k_largest], probs[k_largest]
+        return [self.text_encoder.index_to_word[k] for k in k_largest], probs[0, k_largest]
