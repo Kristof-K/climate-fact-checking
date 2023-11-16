@@ -1,3 +1,4 @@
+from typing import Iterator
 import numpy as np
 import os
 from keras.models import Model, model_from_json
@@ -18,14 +19,7 @@ class MaskedWordModel(MaskedNLPModel):
         self.epochs = epochs
         self.save_epochs = save_epochs
 
-    def train(self, samples_x: np.array, samples_y: np.array, path: str):
-        self.train_comb(path=path, samples_x=samples_x, samples_y=samples_y)
-
-    def train_generator(self, generator, steps: int, path: str):
-        self.train_comb(path=path, generator=generator, steps=steps)
-
-    def train_comb(self, path: str, samples_x: np.array = None, samples_y: np.array = None,
-                   generator=None, steps: int = None):
+    def train(self, generator: Iterator, steps: int, path: str):
         # either generator and steps should be given or all three samples_*
 
         # save model structure
@@ -36,12 +30,8 @@ class MaskedWordModel(MaskedNLPModel):
         i = 0
         loss_vals = dict([('loss', [])])
         while i < self.epochs:
-            if generator is not None:
-                history = self.model.fit(x=generator, batch_size=self.batch_size,
-                                         epochs=self.save_epochs, steps_per_epoch=steps)
-            else:
-                history = self.model.fit(x=samples_x, y=samples_y,
-                                         batch_size=self.batch_size, epochs=self.save_epochs)
+            history = self.model.fit(x=generator, batch_size=self.batch_size,
+                                     epochs=self.save_epochs, steps_per_epoch=steps)
             i += self.save_epochs
             loss_vals['loss'] += history.history['loss']
 

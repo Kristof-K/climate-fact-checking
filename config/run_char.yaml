@@ -1,4 +1,6 @@
 preprocessing:
+  # if file already exists, read statements from it otherwise create it
+  data_file: 'assembled_statements.txt'
   folders: ["UnitedNations", "Wikipedia", "NationalGeographic",
             "TheNewYorkTimes", "NationalOceanicAndAtmosphericAdministration"]
   lower_case: True
@@ -17,14 +19,13 @@ encoding:
   end_token: "\n"
 model_training:
   train: True
-  use_generator: True
   model: "CharToCharBiLSTM"
-  epochs: 25
+  epochs: 5
   # save model weights every save_epochs iterations
   save_epochs: 5
-  learning_rate: 0.1
+  learning_rate: 0.01
   batch_size: 64
-  num_neurons: 256
+  num_neurons: 512
 load_model:
   folder: "CharToCharBiLSTM_2023-11-10_14-53"
   epoch: 5

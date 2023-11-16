@@ -1,3 +1,5 @@
+from typing import Iterator
+
 import numpy as np
 import os
 import sys
@@ -24,10 +26,11 @@ class MyWord2Vec(TextEncoder):
     def get_vocab_size(self):
         return self.max_output
 
-    def learn_encoding(self, sentences: list[str]):
+    def learn_encoding(self, sentences: Iterator[list[str]]):
+        if not os.path.exists(self.path_to_word_vecs):
+            print(f'The word embedding {self.path_to_word_vecs} does not exist', file=sys.stderr)
+
         # load most frequent words
-        # Problem: KeyedVectors has upper case words, maybe we should filter for the most frequent
-        # words in the training data
         self.word_vectors = KeyedVectors.load(self.path_to_word_vecs, mmap='r')
         # somehow adding does not work
         # self.word_vectors.add_vector(self.mask_symbol, np.repeat(1.0, self.vec_dim))
@@ -38,16 +41,14 @@ class MyWord2Vec(TextEncoder):
         self.word_to_index = dict((c, i) for i, c in enumerate(words))
         self.index_to_word = dict((i, c) for i, c in enumerate(words))
 
-    def filter_samples(self, sentences: list[list[str]]):
+    def sample_ok(self, sentence: list[str]):
         if self.word_vectors is None:
             print('learn_encoding() has to be invoked first', file=sys.stderr)
 
         # check whether sentence is short enough and all words are contained in our vocabulary
-        all_fine = np.array([len(tokens) <= self.max_seq_length and
-                             np.all(np.array([token in self.word_to_index.keys() for token in tokens]))
-                             for tokens in sentences])
-        print(f'{all_fine.mean() * 100:.2f}% of the sentences are suitable or training')
-        return [sentences[i] for i in np.arange(len(sentences))[all_fine]]
+        fine = (len(sentence) <= self.max_seq_length and
+                np.all(np.array([token in self.word_to_index.keys() for token in sentence])))
+        return fine
 
     def encode_x(self, samples_x: list[list[str]]):
         if self.word_vectors is None:

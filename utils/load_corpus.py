@@ -1,21 +1,14 @@
 import os
-import sys
-
-DATA_PATH = os.path.join('data')
 
 
-def load_corpus(folders=None):
+def load_corpus(data_folder, folders=None):
+    # generator that reads in file after file and yields text of single files
     if folders is None:
-        folders = [f for f in os.scandir(DATA_PATH) if f.is_dir()]
+        folders = [f for f in os.scandir(data_folder) if f.is_dir()]
     else:
-        folders = [f for f in os.scandir(DATA_PATH) if f.name in folders]
+        folders = [f for f in os.scandir(data_folder) if f.name in folders]
 
-    corpus = ''
-
-    print('Reading in data ...')
     for folder in folders:
-        folder_size = 0
-        print(' ', folder.name)
         for file in os.listdir(folder.path):
             # check file format
             file_format = file.split('.')[1]
@@ -26,13 +19,7 @@ def load_corpus(folders=None):
                 case 'txt':
                     new_text = read_txt(file_path)
 
-            new_size = sys.getsizeof(new_text) / 1024
-            folder_size += new_size
-            print(f' - {file} ({new_size:.2f} KB)')
-            corpus += corpus + '\n\n' + new_text
-        print(f' --> {folder_size / 1024:.2f} MB')
-    print(f'==> corpus size {sys.getsizeof(corpus) / 1024**3} GB\n')
-    return corpus
+            yield new_text
 
 
 def read_txt(path):

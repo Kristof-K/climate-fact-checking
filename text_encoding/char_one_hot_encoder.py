@@ -1,3 +1,4 @@
+from typing import Iterator
 import numpy as np
 import sys
 
@@ -20,14 +21,17 @@ class CharOneHotEncoder(TextEncoder):
     def get_vocab_size(self):
         return self.vocab_size
 
-    def learn_encoding(self, sentences: list[list[str]]):
+    def learn_encoding(self, sentences: Iterator[list[str]]):
         # determine list of all used characters
-        chars = list(set(''.join([''.join(sent) for sent in sentences])))
-        chars.append(' ')
-        chars.append(self.mask_symbol)
-        chars.append(self.start_token)
-        chars.append(self.stop_token)
-        chars = sorted(chars)
+        chars = set()
+        for tokens in sentences:
+            chars = chars.union(set(''.join(tokens)))
+
+        chars.add(' ')
+        chars.add(self.mask_symbol)
+        chars.add(self.start_token)
+        chars.add(self.stop_token)
+        chars = sorted(list(chars))
 
         self.char_to_index = dict((c, i) for i, c in enumerate(chars))
         self.index_to_char = dict((i, c) for i, c in enumerate(chars))
@@ -37,16 +41,13 @@ class CharOneHotEncoder(TextEncoder):
         # each character of the word is contained in our vocabulary
         return np.all(np.array([char in self.char_to_index.keys() for char in word]))
 
-    def filter_samples(self, sentences: list[list[str]]):
+    def sample_ok(self, sentence: list[str]):
         if self.char_to_index == {}:
             print('learn_encoding() has to be invoked first', file=sys.stderr)
 
         # check whether sentence is not too long and all words are contained in our vocabulary
-        all_fine = np.array([len(' '.join(sent)) <= self.max_seq_length and
-                             np.all([self._check_word(w) for w in sent])
-                             for sent in sentences])
-        print(f'{all_fine.mean() * 100:.2f}% are suitable for training')
-        return [sentences[i] for i in np.arange(len(sentences))[all_fine]]
+        fine = (len(' '.join(sentence)) <= self.max_seq_length and np.all([self._check_word(w) for w in sentence]))
+        return fine
 
     def encode_x(self, samples_x: list[list[str]]):
         if self.char_to_index == {}:

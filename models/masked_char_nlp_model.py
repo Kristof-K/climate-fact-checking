@@ -1,3 +1,4 @@
+from typing import Iterator
 import numpy as np
 import os
 from keras.models import Model, model_from_json
@@ -22,14 +23,8 @@ class MaskedChartoChar(MaskedNLPModel):
         self.epochs = epochs
         self.save_epochs = save_epochs
 
-    def train(self, samples_x: np.array, samples_y: np.array, path: str):
-        self.train_comb(path=path, samples_x=samples_x, samples_y=samples_y)
-
-    def train_generator(self, generator, steps: int, path: str):
-        self.train_comb(path=path, generator=generator, steps=steps)
-
     @staticmethod
-    def _wrap_generator(data_generator):
+    def _wrap_generator(data_generator: Iterator):
         for x_num, y_num in data_generator:
             # our actual learning targets are the shifted y-values as we are using them also as input
             y_num_no_start = np.zeros_like(y_num)
@@ -37,8 +32,7 @@ class MaskedChartoChar(MaskedNLPModel):
 
             yield (x_num, y_num), y_num_no_start
 
-    def train_comb(self, path: str, samples_x: np.array = None, samples_y: np.array = None,
-                   generator=None, steps: int = None):
+    def train(self, generator: Iterator, steps: int, path: str):
         # either generator and steps should be given or all three samples_*
 
         # save model structure
@@ -52,17 +46,8 @@ class MaskedChartoChar(MaskedNLPModel):
         i = 0
         loss_vals = dict([('loss', [])])
         while i < self.epochs:
-            if generator is not None:
-                history = self.model.fit(x=MaskedChartoChar._wrap_generator(generator),
-                                         batch_size=self.batch_size, epochs=self.save_epochs,
-                                         steps_per_epoch=steps)
-            else:
-                # we are trying to learn y sequentially: one after the other (+ teacher forcing)
-                samples_y_no_start = np.zeros_like(samples_y)
-                samples_y_no_start[:, :-1, :] = samples_y[:, 1:, :]  # just forget the start token
-
-                history = self.model.fit(x=[samples_x, samples_y], y=samples_y_no_start,
-                                         batch_size=self.batch_size, epochs=self.save_epochs)
+            history = self.model.fit(x=MaskedChartoChar._wrap_generator(generator),
+                                     batch_size=self.batch_size, epochs=self.save_epochs, steps_per_epoch=steps)
             i += self.save_epochs
             loss_vals['loss'] += history.history['loss']
 

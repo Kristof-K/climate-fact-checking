@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Iterator
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -8,11 +9,7 @@ class MaskedNLPModel(ABC):
     # abstract class all models should inherit
 
     @abstractmethod
-    def train(self, samples_x: np.array, samples_y: np.array, path: str):
-        pass
-
-    @abstractmethod
-    def train_generator(self, generator, steps: int, path: str):
+    def train(self, generator: Iterator, steps: int, path: str):
         pass
 
     @abstractmethod

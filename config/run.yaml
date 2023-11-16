@@ -1,30 +1,31 @@
 preprocessing:
+  # if file already exists, read statements from it otherwise create it
+  data_file: 'assembled_statements.txt'
   folders: ["UnitedNations", "Wikipedia", "NationalGeographic",
             "TheNewYorkTimes", "NationalOceanicAndAtmosphericAdministration"]
   lower_case: True
   min_words: 5
-  mask_symbol: "\r"
+  mask_symbol: "<mask>"
 encoding:
-  word_based: False
+  word_based: True
   # if word_based True maximal number of words per statement,
   # otherwise maximal number of characters
-  max_seq_len: 200
+  max_seq_len: 30
   # if word_based True size of output vocabulary, otherwise
   # maximal output sequence length
-  max_output: 30
+  max_output: 3000
   # both tokens only important for character based encoding (word based False)
   start_token: "\t"
   end_token: "\n"
 model_training:
-  train: False
-  use_generator: True
-  model: "CharToCharBiLSTM"
-  epochs: 10
+  train: True
+  model: "WordvecToWordLSTM"
+  epochs: 5
   # save model weights every save_epochs iterations
   save_epochs: 5
   learning_rate: 0.01
   batch_size: 64
-  num_neurons: 256
+  num_neurons: 512
 load_model:
-  folder: "WordvecToWordLSTM_2023-11-15_11-42"
-  epoch: 20
+  folder: "CharToCharBiLSTM_2023-11-10_14-53"
+  epoch: 5

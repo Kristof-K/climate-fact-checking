@@ -1,16 +1,21 @@
 import re   # regular expressions
+from typing import Iterator
+
 from nltk.tokenize import sent_tokenize, word_tokenize
 import numpy as np
 
 # nltk.download('punkt')
 
+NEW_LINE = '\n'
+
 
 class TextPreprocessor:
 
     def __init__(self, config: dict):
-        self.mask_symbol = config["mask_symbol"]
-        self.lower_case = config["lower_case"]
-        self.min_words = config["min_words"]
+        self.mask_symbol = config['mask_symbol']
+        self.lower_case = config['lower_case']
+        self.min_words = config['min_words']
+        self.data_file = config['data_file']
 
     def preprocess_corpus(self, corpus: str):
         # remove artifacts: citation numbers
@@ -40,40 +45,31 @@ class TextPreprocessor:
         # filter for non-empty sentences, and remove leading and trailing spaces and point
         sentences = [sentence.strip(' ').rstrip('.') for sentence in sentences if sentence != '' and sentence != '.']
 
-        TextPreprocessor.analyze_sentence_lengths(sentences)
-
         return sentences
 
-    @staticmethod
-    def _analyze_lengths(lengths: np.array, desc: str, q_levels: np.array = np.array([0.1, 0.25, 0.5, 0.75, 0.9])):
-        print(f"\n{desc} length distribution:")
-        print(f"Min:  {lengths.min()}\nMean: {lengths.mean()}\nMax:  {lengths.max()}")
-        print("Quantiles:", q_levels)
-        print(np.quantile(lengths, q=q_levels))
+    def save_sentences(self, corpus_generator: Iterator[str]):
+        # preprocess sentences of corpus and write preprocessed sentences in one big text file
+        with open(self.data_file, 'w', encoding='utf-8') as f:
+            for text in corpus_generator:
+                sentences = self.extract_sentences(text)
+                for sent in sentences:
+                    f.write(sent)
+                    f.write(NEW_LINE)
 
-    @staticmethod
-    def analyze_sentence_lengths(sentences: list[str]):
-        lengths = np.array([len(s) for s in sentences])
-        TextPreprocessor._analyze_lengths(lengths, "Sentence")
+    def get_num_of_sentences(self):
+        lines = 0
+        with open(self.data_file, 'r', encoding='utf-8') as f:
+            for line in f:
+                lines = lines + 1
+        return lines
 
-    def tokenize_sentences(self, sentences: list[str]):
-        tokenized_sentences = []
-
-        for sent in sentences:
-            word_tokens = word_tokenize(sent)
-
-            if len(word_tokens) < self.min_words:
-                continue
-            tokenized_sentences.append(word_tokens)
-
-        TextPreprocessor.analyze_word_lengths(tokenized_sentences)
-        return tokenized_sentences
-
-    @staticmethod
-    def analyze_word_lengths(sentences: list[list[str]]):
-        # sum appends all lists contained in sentences
-        lengths = np.array([len(w) for w in sum(sentences, [])])
-        TextPreprocessor._analyze_lengths(lengths, "Word")
+    def get_sent_generator(self):
+        # generator for the preprocessed sentences: yield sentence after sentence and work_tokenize it
+        with open(self.data_file, 'r', encoding='utf-8') as f:
+            for line in f:      # read file line by line
+                word_tokens = word_tokenize(line.rstrip(NEW_LINE))
+                if len(word_tokens) >= self.min_words:
+                    yield word_tokens
 
     def get_masked_word_tokens(self, sentences_tokenized: list[list[str]]):
         masked_sentences = []
