@@ -54,12 +54,12 @@ def get_training_data_generator(batch_size, text_prepro, text_embedding):
                 yield x_num[:batch_size], y_num[:batch_size]
                 x_num_prev = x_num[batch_size:]
                 y_num_prev = y_num[batch_size:]
-                sent_batch = []
                 # yield previous processing
                 while x_num_prev.shape[0] >= batch_size:
                     yield x_num_prev[:batch_size], y_num_prev[:batch_size]
                     x_num_prev = x_num_prev[batch_size:]
                     y_num_prev = y_num_prev[batch_size:]
+                sent_batch = []
 
 
 if __name__ == '__main__':
@@ -82,8 +82,8 @@ if __name__ == '__main__':
     config['encoding']['mask_symbol'] = config['preprocessing']['mask_symbol']
     text_embedding = get_encoder(config['encoding'])
     text_embedding.learn_encoding(text_prepro.get_sent_generator())
-    num_of_sents = text_prepro.get_num_of_sentences()
-    print(f'Corpus comprises {num_of_sents} climate statements')
+    num_tokens = text_prepro.get_num_of_tokens()
+    print(f'Corpus comprises {num_tokens} climate statements')
 
     # train or load the model ----------------------------------------------------------------
     model = get_model(text_embedding, config['model_training'])
@@ -93,18 +93,18 @@ if __name__ == '__main__':
 
         batch_size = config['model_training']['batch_size']
         data_gen = get_training_data_generator(batch_size, text_prepro, text_embedding)
-        model.train(data_gen, steps=num_of_sents // batch_size + 1, path=path)
+        model.train(data_gen, steps=num_tokens // batch_size + 1, path=path)
 
     else:
         model.load_model(path=os.path.join(MODEL_PATH, config['load_model']['folder']),
                          epoch=config['load_model']['epoch'])
 
     # check performance on some of the training statements -----------------------------------
-    pick = random.sample(range(num_of_sents), 10)
+    pick = [13, 52, 100, 501, 1000]
     sent_gen = text_prepro.get_sent_generator()
 
     for i, sent in enumerate(sent_gen):
-        if i != pick:
+        if i not in pick or not text_embedding.sample_ok(sent):
             continue
         masked_statements, masked_words = text_prepro.get_masked_word_tokens([sent])
         x_num = text_embedding.encode_x(masked_statements)

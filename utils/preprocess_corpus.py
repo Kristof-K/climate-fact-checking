@@ -2,7 +2,6 @@ import re   # regular expressions
 from typing import Iterator
 
 from nltk.tokenize import sent_tokenize, word_tokenize
-import numpy as np
 
 # nltk.download('punkt')
 
@@ -56,12 +55,12 @@ class TextPreprocessor:
                     f.write(sent)
                     f.write(NEW_LINE)
 
-    def get_num_of_sentences(self):
-        lines = 0
-        with open(self.data_file, 'r', encoding='utf-8') as f:
-            for line in f:
-                lines = lines + 1
-        return lines
+    def get_num_of_tokens(self):
+        # return number of tokens to determine how much training examples we have
+        sum_up = 0
+        for word_tokens in self.get_sent_generator():
+            sum_up += len(word_tokens)
+        return sum_up
 
     def get_sent_generator(self):
         # generator for the preprocessed sentences: yield sentence after sentence and work_tokenize it
