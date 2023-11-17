@@ -1,5 +1,5 @@
 import re   # regular expressions
-from typing import Iterator
+from typing import Iterator, List
 
 from nltk.tokenize import sent_tokenize, word_tokenize
 
@@ -70,7 +70,7 @@ class TextPreprocessor:
                 if len(word_tokens) >= self.min_words:
                     yield word_tokens
 
-    def get_masked_word_tokens(self, sentences_tokenized: list[list[str]]):
+    def get_masked_word_tokens(self, sentences_tokenized: List[List[str]]):
         masked_sentences = []
         masked_word = []
 

@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, List
 
 import numpy as np
 import os
@@ -26,7 +26,7 @@ class MyWord2Vec(TextEncoder):
     def get_vocab_size(self):
         return self.max_output
 
-    def learn_encoding(self, sentences: Iterator[list[str]]):
+    def learn_encoding(self, sentences: Iterator[List[str]]):
         if not os.path.exists(self.path_to_word_vecs):
             print(f'The word embedding {self.path_to_word_vecs} does not exist', file=sys.stderr)
 
@@ -41,7 +41,7 @@ class MyWord2Vec(TextEncoder):
         self.word_to_index = dict((c, i) for i, c in enumerate(words))
         self.index_to_word = dict((i, c) for i, c in enumerate(words))
 
-    def sample_ok(self, sentence: list[str]):
+    def sample_ok(self, sentence: List[str]):
         if self.word_vectors is None:
             print('learn_encoding() has to be invoked first', file=sys.stderr)
 
@@ -50,7 +50,7 @@ class MyWord2Vec(TextEncoder):
                 np.all(np.array([token in self.word_to_index.keys() for token in sentence])))
         return fine
 
-    def encode_x(self, samples_x: list[list[str]]):
+    def encode_x(self, samples_x: List[List[str]]):
         if self.word_vectors is None:
             print('learn_encoding() has to be invoked first', file=sys.stderr)
 
@@ -61,7 +61,7 @@ class MyWord2Vec(TextEncoder):
                 x_num[i, t, :] = self.word_vectors[word]
         return x_num
 
-    def encode_y(self, samples_y: list[str]):
+    def encode_y(self, samples_y: List[str]):
         if self.word_vectors is None:
             print('learn_encoding() has to be invoked first', file=sys.stderr)
 

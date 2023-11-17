@@ -1,5 +1,4 @@
 import yaml
-import random
 import datetime
 import os
 import shutil   # to copy files
@@ -100,7 +99,7 @@ if __name__ == '__main__':
                          epoch=config['load_model']['epoch'])
 
     # check performance on some of the training statements -----------------------------------
-    pick = [13, 52, 100, 501, 1000]
+    pick = [13, 53, 100, 501, 1000]
     sent_gen = text_prepro.get_sent_generator()
 
     for i, sent in enumerate(sent_gen):

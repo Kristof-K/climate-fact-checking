@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, List
 import numpy as np
 import sys
 
@@ -21,7 +21,7 @@ class CharOneHotEncoder(TextEncoder):
     def get_vocab_size(self):
         return self.vocab_size
 
-    def learn_encoding(self, sentences: Iterator[list[str]]):
+    def learn_encoding(self, sentences: Iterator[List[str]]):
         # determine list of all used characters
         chars = set()
         for tokens in sentences:
@@ -41,7 +41,7 @@ class CharOneHotEncoder(TextEncoder):
         # each character of the word is contained in our vocabulary
         return np.all(np.array([char in self.char_to_index.keys() for char in word]))
 
-    def sample_ok(self, sentence: list[str]):
+    def sample_ok(self, sentence: List[str]):
         if self.char_to_index == {}:
             print('learn_encoding() has to be invoked first', file=sys.stderr)
 
@@ -49,7 +49,7 @@ class CharOneHotEncoder(TextEncoder):
         fine = (len(' '.join(sentence)) <= self.max_seq_length and np.all([self._check_word(w) for w in sentence]))
         return fine
 
-    def encode_x(self, samples_x: list[list[str]]):
+    def encode_x(self, samples_x: List[List[str]]):
         if self.char_to_index == {}:
             print('learn_encoding() has to be invoked first', file=sys.stderr)
 
@@ -60,7 +60,7 @@ class CharOneHotEncoder(TextEncoder):
                 x_num[i, t, self.char_to_index[char]] = 1.0
         return x_num
 
-    def encode_y(self, samples_y: list[str]):
+    def encode_y(self, samples_y: List[str]):
         if self.char_to_index == {}:
             print('learn_encoding() has to be invoked first', file=sys.stderr)
 

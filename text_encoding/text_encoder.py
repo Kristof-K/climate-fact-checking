@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Iterator
+from typing import Iterator, List
 
 import numpy as np
 
@@ -11,19 +11,19 @@ class TextEncoder(ABC):
         pass
 
     @abstractmethod
-    def learn_encoding(self, sentences: Iterator[list[str]]):
+    def learn_encoding(self, sentences: Iterator[List[str]]):
         pass
 
     @abstractmethod
-    def sample_ok(self, sentences: list[str]):
+    def sample_ok(self, sentences: List[str]):
         pass
 
     @abstractmethod
-    def encode_x(self, samples_x: list[list[str]]):
+    def encode_x(self, samples_x: List[List[str]]):
         pass
 
     @abstractmethod
-    def encode_y(self, samples_y: list[str]):
+    def encode_y(self, samples_y: List[str]):
         pass
 
     @abstractmethod

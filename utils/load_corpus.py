@@ -15,9 +15,8 @@ def load_corpus(data_folder, folders=None):
             file_path = os.path.join(folder.path, file)
             new_text = ''
 
-            match file_format:
-                case 'txt':
-                    new_text = read_txt(file_path)
+            if file_format == 'txt':
+                new_text = read_txt(file_path)
 
             yield new_text
 
