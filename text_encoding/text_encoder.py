@@ -31,5 +31,5 @@ class TextEncoder(ABC):
         pass
 
     @abstractmethod
-    def decode(self, model_output: np.array):
+    def decode(self, indices: np.array):
         pass

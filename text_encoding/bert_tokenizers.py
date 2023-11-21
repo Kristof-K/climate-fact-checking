@@ -49,5 +49,5 @@ class MyBertTokenizer(TextEncoder):
     def encode_one_y(self, y: str):
         return self.tokenizer.convert_tokens_to_ids(y)
 
-    def decode(self, model_output: np.array):
-        return self.tokenizer.decode(np.argmax(model_output[0], axis=0))
+    def decode(self, indices: np.array):
+        return [self.tokenizer.decode(i) for i in indices]

@@ -19,7 +19,7 @@ encoding:
   start_token: "\t"
   end_token: "\n"
 model_training:
-  train: True
+  train: False
   model: "distilbert-base-uncased"
   epochs: 10
   # save model weights every save_epochs iterations
@@ -28,5 +28,5 @@ model_training:
   batch_size: 64
   num_neurons: 512
 load_model:
-  folder: "WordvecToWordLSTM_2023-11-14_17-27"
+  folder: "distilbert-base-uncased_2023-11-21_15-30"
   epoch: 5

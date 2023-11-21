@@ -4,7 +4,7 @@ import os
 from keras.models import model_from_json
 from keras.optimizers import Adam
 from keras.losses import SparseCategoricalCrossentropy
-from transformers import TFAutoModelForMaskedLM
+from transformers import TFAutoModelForMaskedLM, TFDistilBertForMaskedLM
 
 from models.masked_nlp_model import MaskedNLPModel
 from text_encoding.bert_tokenizers import MyBertTokenizer
@@ -44,10 +44,7 @@ class WrappedBert(MaskedNLPModel):
         loss_fn = SparseCategoricalCrossentropy(from_logits=True)
         self.model.compile(optimizer=optimizer, loss=loss_fn)
 
-        # save model structure
-        model_struc_enc = self.model.to_json()
-        with open(os.path.join(path, 'model.json'), 'w') as json_file:
-            json_file.write(model_struc_enc)
+        # save model structure: no need as we just reinitialize the model
 
         i = 0
         loss_vals = dict([('loss', [])])
@@ -61,23 +58,20 @@ class WrappedBert(MaskedNLPModel):
         MaskedNLPModel.print_loss(loss_vals, path)
 
     def load_model(self, path, epoch):
-        with open(os.path.join(path, 'model.json'), 'r') as json_file:
-            json_string = json_file.read()
-        self.model = model_from_json(json_string)
         self.model.load_weights(os.path.join(path, f'model_{epoch}.h5'))
 
     def get_token_probability(self, x_num: np.array, masked_word: str):
-        scores = self.model(x_num).logits
-        masked_position = np.argwhere(x_num["input_ids"] == self.text_encoder.mask_token_id)
+        scores = self.model(x_num).logits.numpy()
+        masked_position = np.argwhere(x_num[0, :] == self.text_encoder.mask_token_id)[0, 0]
 
         true_word = self.text_encoder.encode_one_y(masked_word)
 
         return scores[0, masked_position, true_word]
 
     def get_most_likely_words(self, x_num: np.array, n_beams: int = 5):
-        scores = self.model(x_num).logits
-        masked_position = np.argwhere(x_num["input_ids"] == self.text_encoder.mask_token_id)
+        scores = self.model(x_num).logits.numpy()
+        masked_position = np.argwhere(x_num[0, :] == self.text_encoder.mask_token_id)[0, 0]
         k_largest = np.argsort(-1.0 * scores[0, masked_position, :])[:n_beams]
 
         # text encoder returns tokens as sentence separated by spaces
-        return self.text_encoder.decode(k_largest).split(' '), scores[0, masked_position, k_largest]
+        return self.text_encoder.decode(k_largest), scores[0, masked_position, k_largest]

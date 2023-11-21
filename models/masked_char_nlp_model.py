@@ -129,7 +129,7 @@ class MaskedChartoChar(MaskedNLPModel):
 
         k_largest = np.argsort(-1.0 * char_probs[0, 0, :])[:k]
 
-        new_chars = [self.text_encoder.index_to_char[i] for i in k_largest]
+        new_chars = self.text_encoder.decode(k_largest)
         probs = char_probs[0, 0, k_largest]
         new_thoughts = [[h, c]] * k
 

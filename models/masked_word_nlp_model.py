@@ -54,4 +54,4 @@ class MaskedWordModel(MaskedNLPModel):
         probs = self.model.predict(x_num, verbose=0)
         k_largest = np.argsort(-1.0 * probs[0, :])[:n_beams]
 
-        return [self.text_encoder.index_to_word[k] for k in k_largest], probs[0, k_largest]
+        return self.text_encoder.decode(k_largest), probs[0, k_largest]

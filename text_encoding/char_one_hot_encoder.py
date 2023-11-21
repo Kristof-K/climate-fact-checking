@@ -80,8 +80,8 @@ class CharOneHotEncoder(TextEncoder):
         y_num[0, 0, self.char_to_index[y]] = 1.0
         return y_num
 
-    def decode(self, model_output: np.array):
+    def decode(self, indices: np.array):
         if self.index_to_char == {}:
             print('learn_encoding() has to be invoked first', file=sys.stderr)
 
-        return self.index_to_char[np.argmax(model_output, axis=0)]
+        return [self.index_to_char[i] for i in indices]
