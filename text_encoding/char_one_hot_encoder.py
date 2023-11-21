@@ -60,7 +60,7 @@ class CharOneHotEncoder(TextEncoder):
                 x_num[i, t, self.char_to_index[char]] = 1.0
         return x_num
 
-    def encode_y(self, samples_y: List[str]):
+    def encode_training_xy(self, samples_x: List[List[str]], samples_y: List[str]):
         if self.char_to_index == {}:
             print('learn_encoding() has to be invoked first', file=sys.stderr)
 
@@ -70,7 +70,7 @@ class CharOneHotEncoder(TextEncoder):
             for t, char in enumerate((self.start_token + word_token + self.stop_token)):
                 y_num[i, t, self.char_to_index[char]] = 1.0
 
-        return y_num
+        return self.encode_x(samples_x), y_num
 
     def encode_one_y(self, y: str):
         if self.char_to_index == {}:

@@ -33,8 +33,6 @@ class MaskedChartoChar(MaskedNLPModel):
             yield (x_num, y_num), y_num_no_start
 
     def train(self, generator: Iterator, steps: int, path: str):
-        # either generator and steps should be given or all three samples_*
-
         # save model structure
         model_struc_enc = self.encoder.to_json()
         with open(os.path.join(path, 'encoder.json'), 'w') as json_file:

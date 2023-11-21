@@ -20,8 +20,6 @@ class MaskedWordModel(MaskedNLPModel):
         self.save_epochs = save_epochs
 
     def train(self, generator: Iterator, steps: int, path: str):
-        # either generator and steps should be given or all three samples_*
-
         # save model structure
         model_struc_enc = self.model.to_json()
         with open(os.path.join(path, 'model.json'), 'w') as json_file:

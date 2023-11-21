@@ -2,6 +2,7 @@ import re   # regular expressions
 from typing import Iterator, List
 
 from nltk.tokenize import sent_tokenize, word_tokenize
+from transformers import AutoTokenizer
 
 # nltk.download('punkt')
 
@@ -15,6 +16,11 @@ class TextPreprocessor:
         self.lower_case = config['lower_case']
         self.min_words = config['min_words']
         self.data_file = config['data_file']
+
+        if config['word_tokenizer'] == 'nltk':
+            self.w_tokenize = word_tokenize
+        else:       # it is one of the BERT tokenizer
+            self.w_tokenize = AutoTokenizer.from_pretrained(config['model']).tokenize
 
     def preprocess_corpus(self, corpus: str):
         # remove artifacts: citation numbers
@@ -66,7 +72,7 @@ class TextPreprocessor:
         # generator for the preprocessed sentences: yield sentence after sentence and work_tokenize it
         with open(self.data_file, 'r', encoding='utf-8') as f:
             for line in f:      # read file line by line
-                word_tokens = word_tokenize(line.rstrip(NEW_LINE))
+                word_tokens = self.w_tokenize(line.rstrip(NEW_LINE))
                 if len(word_tokens) >= self.min_words:
                     yield word_tokens
 

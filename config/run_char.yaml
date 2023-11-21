@@ -6,6 +6,7 @@ preprocessing:
   lower_case: True
   min_words: 5
   mask_symbol: "\r"
+  word_tokenizer: "nltk"
 encoding:
   word_based: False
   # if word_based True maximal number of words per statement,
@@ -20,10 +21,10 @@ encoding:
 model_training:
   train: True
   model: "CharToCharBiLSTM"
-  epochs: 5
+  epochs: 20
   # save model weights every save_epochs iterations
-  save_epochs: 5
-  learning_rate: 0.01
+  save_epochs: 10
+  learning_rate: 0.001
   batch_size: 64
   num_neurons: 512
 load_model:

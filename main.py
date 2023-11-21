@@ -26,8 +26,7 @@ def create_folder(model_name: str):
 
 def get_all_training_data(sentences, text_prepro, text_embedding):
     masked_statements, masked_words = text_prepro.get_masked_word_tokens(sentences)
-    x_num = text_embedding.encode_x(masked_statements)
-    y_num = text_embedding.encode_y(masked_words)
+    x_num, y_num = text_embedding.encode_training_xy(masked_statements, masked_words)
     return x_num, y_num
 
 
@@ -64,6 +63,10 @@ def get_training_data_generator(batch_size, text_prepro, text_embedding):
 if __name__ == '__main__':
     with open(CONFIG_FILE, 'r') as f:
         config = yaml.safe_load(f)
+    # copy some attributes
+    config['preprocessing']['model'] = config['model_training']['model']
+    config['encoding']['model'] = config['model_training']['model']
+    config['encoding']['mask_symbol'] = config['preprocessing']['mask_symbol']
 
     if not os.path.exists(MODEL_PATH):
         os.mkdir(MODEL_PATH)
@@ -78,7 +81,6 @@ if __name__ == '__main__':
         text_prepro.save_sentences(corpus_generator)
 
     # encode text by word_embedding or character/word one hot encoding -----------------------
-    config['encoding']['mask_symbol'] = config['preprocessing']['mask_symbol']
     text_embedding = get_encoder(config['encoding'])
     text_embedding.learn_encoding(text_prepro.get_sent_generator())
     num_tokens = text_prepro.get_num_of_tokens()

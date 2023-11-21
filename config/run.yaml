@@ -5,7 +5,8 @@ preprocessing:
             "TheNewYorkTimes", "NationalOceanicAndAtmosphericAdministration"]
   lower_case: True
   min_words: 5
-  mask_symbol: "<mask>"
+  mask_symbol: "[MASK]"
+  word_tokenizer: "DistilBERT"
 encoding:
   word_based: True
   # if word_based True maximal number of words per statement,
@@ -13,19 +14,19 @@ encoding:
   max_seq_len: 30
   # if word_based True size of output vocabulary, otherwise
   # maximal output sequence length
-  max_output: 3000
+  max_output: 50000
   # both tokens only important for character based encoding (word based False)
   start_token: "\t"
   end_token: "\n"
 model_training:
-  train: False
-  model: "WordvecToWordBiLSTM"
-  epochs: 20
+  train: True
+  model: "distilbert-base-uncased"
+  epochs: 10
   # save model weights every save_epochs iterations
-  save_epochs: 10
-  learning_rate: 0.01
+  save_epochs: 5
+  learning_rate: 0.00001
   batch_size: 64
-  num_neurons: 1024
+  num_neurons: 512
 load_model:
-  folder: "WordvecToWordBiLSTM_2023-11-17_09-52"
-  epoch: 10
+  folder: "WordvecToWordLSTM_2023-11-14_17-27"
+  epoch: 5

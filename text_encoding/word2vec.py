@@ -61,7 +61,7 @@ class MyWord2Vec(TextEncoder):
                 x_num[i, t, :] = self.word_vectors[word]
         return x_num
 
-    def encode_y(self, samples_y: List[str]):
+    def encode_training_xy(self, samples_x: List[List[str]], samples_y: List[str]):
         if self.word_vectors is None:
             print('learn_encoding() has to be invoked first', file=sys.stderr)
 
@@ -70,7 +70,7 @@ class MyWord2Vec(TextEncoder):
         for i, word_token in enumerate(samples_y):
             y_num[i, self.word_to_index[word_token]] = 1.0
 
-        return y_num
+        return self.encode_x(samples_x), y_num
 
     def encode_one_y(self, y: str):
         if self.word_vectors is None:

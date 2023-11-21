@@ -23,7 +23,7 @@ class TextEncoder(ABC):
         pass
 
     @abstractmethod
-    def encode_y(self, samples_y: List[str]):
+    def encode_training_xy(self, samples_x: List[List[str]], samples_y: List[str]):
         pass
 
     @abstractmethod
