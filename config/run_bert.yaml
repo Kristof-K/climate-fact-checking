@@ -1,11 +1,13 @@
 preprocessing:
   # if file already exists, read statements from it otherwise create it
-  data_file: 'wikiepedia_climate_2.txt'
-  folders: "WIKIPEDIA"
+  data_file: 'assembled_statements.txt'
+  folders: ["UnitedNations", "Wikipedia", "NationalGeographic",
+            "TheNewYorkTimes", "NationalOceanicAndAtmosphericAdministration"]
   lower_case: True
   min_words: 5
-  mask_symbol: "<mask>"
-  word_tokenizer: "nltk"
+  mask_symbol: "[MASK]"
+  word_tokenizer: "DistilBERT"
+encoding:
   word_based: True
   # if word_based True maximal number of words per statement,
   # otherwise maximal number of characters
@@ -17,14 +19,14 @@ preprocessing:
   start_token: "\t"
   end_token: "\n"
 model_training:
-  train: True
-  model: "WordvecToWordBiLSTM"
+  train: False
+  model: "distilbert-base-uncased"
   epochs: 10
   # save model weights every save_epochs iterations
   save_epochs: 5
-  learning_rate: 0.001
+  learning_rate: 0.00001
   batch_size: 64
-  num_neurons: [ 2024, 1024 ]
+  num_neurons: 512
 load_model:
   folder: "distilbert-base-uncased_2023-11-21_15-30"
   epoch: 5

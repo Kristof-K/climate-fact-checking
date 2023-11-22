@@ -7,14 +7,17 @@ from gensim.models.keyedvectors import KeyedVectors
 
 from text_encoding.text_encoder import TextEncoder
 
+from word_embeddings.learn_custom_word_embeding import WORD_VECTOR_FILE_EXT
+
 WORD_VECS_DIR = os.path.join('word_embeddings')
-WORD_VECS = 'climate_word2vec.wordvectors'
 
 
 class MyWord2Vec(TextEncoder):
 
-    def __init__(self, max_seq_length: int, max_output: int, mask_symbol: str):
-        self.path_to_word_vecs = os.path.join(WORD_VECS_DIR, WORD_VECS)
+    def __init__(self, max_seq_length: int, max_output: int, mask_symbol: str, data_file: str):
+        data_file_name = data_file.split('.')[0]
+
+        self.path_to_word_vecs = os.path.join(WORD_VECS_DIR, data_file_name + WORD_VECTOR_FILE_EXT)
         self.max_seq_length = max_seq_length
         self.max_output = max_output
         self.mask_symbol = mask_symbol
@@ -28,7 +31,8 @@ class MyWord2Vec(TextEncoder):
 
     def learn_encoding(self, sentences: Iterator[List[str]]):
         if not os.path.exists(self.path_to_word_vecs):
-            print(f'The word embedding {self.path_to_word_vecs} does not exist', file=sys.stderr)
+            print(f'The word embedding {self.path_to_word_vecs} does not exist\n',
+                  'Please look at word_embeddings.learn_custom_word_embedding.py\n\n', file=sys.stderr)
 
         # load most frequent words
         self.word_vectors = KeyedVectors.load(self.path_to_word_vecs, mmap='r')

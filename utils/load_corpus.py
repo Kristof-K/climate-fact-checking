@@ -1,8 +1,17 @@
 import os
 
+from utils.load_wikipedia_huggingface import get_climate_articles
+
 
 def load_corpus(data_folder, folders=None):
     # generator that reads in file after file and yields text of single files
+
+    if folders == 'WIKIPEDIA':      # read from the downloaded hugging face Wikipedia articles
+        for new_text in get_climate_articles():
+            yield new_text
+        return
+
+    # read from the manually downloaded articles
     if folders is None:
         folders = [f for f in os.scandir(data_folder) if f.is_dir()]
     else:

@@ -7,7 +7,9 @@ from utils.load_corpus import load_corpus
 from utils.preprocess_corpus import TextPreprocessor
 
 EMBEDDINGS_PATH = 'word_embeddings'
-DATA_PATH = os.path.join('data')
+DATA_PATH = 'data'
+
+WORD_VECTOR_FILE_EXT = '.wordvectors'
 
 
 class MyCorpus:
@@ -23,7 +25,7 @@ class MyCorpus:
             yield line
 
 
-def learn_word_embedding(sentence_tokens, mask_symbol):
+def learn_word_embedding(sentence_tokens, mask_symbol, output_name):
     num_features = 300
     min_word_count = 3
     num_workers = 1
@@ -38,7 +40,7 @@ def learn_word_embedding(sentence_tokens, mask_symbol):
     # Store just the words + their trained embeddings.
     word_vectors = model.wv     # get the keyed vectors
     word_vectors.add_vector(mask_symbol, np.repeat(1.0, num_features))
-    word_vectors.save(os.path.join(EMBEDDINGS_PATH, "climate_word2vec.wordvectors"))
+    word_vectors.save(os.path.join(EMBEDDINGS_PATH, output_name + WORD_VECTOR_FILE_EXT))
     print(f'Found {len(word_vectors.vectors)} word vectors')
 
 
@@ -82,12 +84,13 @@ if __name__ == '__main__':
     mask_symbol = "<mask>"
     folders = ["UnitedNations", "Wikipedia", "NationalGeographic", "TheNewYorkTimes",
                "NationalOceanicAndAtmosphericAdministration"]
+    data_file_name = 'assembled_statements.txt'
 
     corpus_generator = load_corpus(DATA_PATH, folders=folders)
     text_prepro = TextPreprocessor({'lower_case': True, 'min_words': 5, 'mask_symbol': mask_symbol,
-                                    'data_file': os.path.join(DATA_PATH, 'assembled_statements.txt')})
+                                    'data_file': os.path.join(DATA_PATH, data_file_name)})
     text_prepro.save_sentences(corpus_generator)
 
     analyze_sentences(text_prepro.get_sent_generator())
 
-    learn_word_embedding(MyCorpus(text_prepro), mask_symbol=mask_symbol)
+    learn_word_embedding(MyCorpus(text_prepro), mask_symbol=mask_symbol, output_name=data_file_name.split('.')[0])

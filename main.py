@@ -65,15 +65,13 @@ if __name__ == '__main__':
         config = yaml.safe_load(f)
     # copy some attributes
     config['preprocessing']['model'] = config['model_training']['model']
-    config['encoding']['model'] = config['model_training']['model']
-    config['encoding']['mask_symbol'] = config['preprocessing']['mask_symbol']
+    data_file = os.path.join(DATA_PATH, config['preprocessing']['data_file'])
+    config['preprocessing']['data_file_path'] = data_file
 
     if not os.path.exists(MODEL_PATH):
         os.mkdir(MODEL_PATH)
 
     # load and preprocess corpus -------------------------------------------------------------
-    data_file = os.path.join(DATA_PATH, config['preprocessing']['data_file'])
-    config['preprocessing']['data_file'] = data_file
     text_prepro = TextPreprocessor(config['preprocessing'])
     if not os.path.exists(data_file):
         # create assembled sentence file
@@ -81,7 +79,7 @@ if __name__ == '__main__':
         text_prepro.save_sentences(corpus_generator)
 
     # encode text by word_embedding or character/word one hot encoding -----------------------
-    text_embedding = get_encoder(config['encoding'])
+    text_embedding = get_encoder(config['preprocessing'])
     text_embedding.learn_encoding(text_prepro.get_sent_generator())
     num_tokens = text_prepro.get_num_of_tokens()
     print(f'Corpus comprises {num_tokens} climate statements')

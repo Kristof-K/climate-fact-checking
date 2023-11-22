@@ -15,7 +15,7 @@ class TextPreprocessor:
         self.mask_symbol = config['mask_symbol']
         self.lower_case = config['lower_case']
         self.min_words = config['min_words']
-        self.data_file = config['data_file']
+        self.data_file = config['data_file_path']
 
         if config['word_tokenizer'] == 'nltk':
             self.w_tokenize = word_tokenize
@@ -37,9 +37,8 @@ class TextPreprocessor:
 
     def extract_sentences(self, corpus: str):
         corpus_modified = self.preprocess_corpus(corpus)
-        # replace newlines and multiple spaces by one space
-        corpus_modified = re.sub(r'\n{2,}', '. ', corpus_modified)
-        corpus_modified = re.sub(r'\n', ' ', corpus_modified)
+        # replace newlines and multiple spaces
+        corpus_modified = re.sub(r'\n+', '. ', corpus_modified)
         corpus_modified = re.sub(r'\s{2,}', ' ', corpus_modified)
         corpus_modified = re.sub(r'\.{2,}', '.', corpus_modified)
         # sent tokenize does not split sentences if they end with a year number

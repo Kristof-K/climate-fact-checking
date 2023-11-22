@@ -14,7 +14,8 @@ def get_encoder(config):
         else:
             return MyWord2Vec(max_seq_length=config['max_seq_len'],
                               max_output=config['max_output'],
-                              mask_symbol=config['mask_symbol'])
+                              mask_symbol=config['mask_symbol'],
+                              data_file=config['data_file'])
     else:
         return CharOneHotEncoder(max_seq_length=config['max_seq_len'],
                                  max_output=config['max_output'],
