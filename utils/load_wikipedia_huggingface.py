@@ -7,11 +7,16 @@ MIN_WORD_COUNT = 7
 MIN_WORD_DENSITY = 1.0 / 100.0
 
 
+# get al wikipedia articles from hugging face: https://huggingface.co/datasets/wikipedia
+# and filter for only climate relevant articles
+
+
 def get_climate_articles():
     all_articles = load_dataset("wikipedia", "20220301.en")
-    # check for the earliest (? --> lazy matching) of 'See also', 'References', 'References and notes')
+    # check for the earliest (? --> lazy matching) of 'See also', 'References', 'References and notes', ...
     # use re.DOTALL so that '.' also matches newlines
-    throw_away = re.compile(r'(.*?)(See also\s*\n|References\s*\n|References and notes\s*\n)', flags=re.DOTALL)
+    throw_away = re.compile(r'(.*?)(See also|References|References and notes|Notes|Bibliography|Selected '
+                            r'bibliography)\s*\n', flags=re.DOTALL)
 
     for i in range(all_articles['train'].shape[0]):
         curr_article = all_articles['train'][i]

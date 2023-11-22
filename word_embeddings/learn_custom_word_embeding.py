@@ -6,9 +6,9 @@ from gensim.models.word2vec import Word2Vec
 from utils.load_corpus import load_corpus
 from utils.preprocess_corpus import TextPreprocessor
 
-EMBEDDINGS_PATH = 'word_embeddings'
-DATA_PATH = 'data'
+from main import DATA_PATH
 
+EMBEDDINGS_PATH = 'word_embeddings'
 WORD_VECTOR_FILE_EXT = '.wordvectors'
 
 
@@ -81,15 +81,16 @@ def analyze_sentences(sentences):
 if __name__ == '__main__':
     os.chdir("..")     # go one up in root directory, so that data loading works
 
-    mask_symbol = "<mask>"
-    folders = ["UnitedNations", "Wikipedia", "NationalGeographic", "TheNewYorkTimes",
-               "NationalOceanicAndAtmosphericAdministration"]
-    data_file_name = 'assembled_statements.txt'
+    mask_symbol = '<mask>'
+    folders = 'WIKIPEDIA'
+    data_file_name = 'wikipedia_climate.txt'
+    data_file_path = os.path.join(DATA_PATH, data_file_name)
 
-    corpus_generator = load_corpus(DATA_PATH, folders=folders)
     text_prepro = TextPreprocessor({'lower_case': True, 'min_words': 5, 'mask_symbol': mask_symbol,
-                                    'data_file': os.path.join(DATA_PATH, data_file_name)})
-    text_prepro.save_sentences(corpus_generator)
+                                    'data_file_path': data_file_path, 'word_tokenizer': 'nltk'})
+    if not os.path.exists(data_file_path):
+        corpus_generator = load_corpus(DATA_PATH, folders=folders)
+        text_prepro.save_sentences(corpus_generator)
 
     analyze_sentences(text_prepro.get_sent_generator())
 

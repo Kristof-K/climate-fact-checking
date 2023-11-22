@@ -1,6 +1,6 @@
 preprocessing:
   # if file already exists, read statements from it otherwise create it
-  data_file: 'wikiepedia_climate_2.txt'
+  data_file: 'wikipedia_climate.txt'
   folders: "WIKIPEDIA"
   lower_case: True
   min_words: 5
