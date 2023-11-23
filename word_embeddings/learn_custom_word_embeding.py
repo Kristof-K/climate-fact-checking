@@ -3,13 +3,9 @@ import os
 import numpy as np
 from gensim.models.word2vec import Word2Vec
 
+from constants import DATA_PATH, EMBEDDINGS_PATH, WORD_VECTOR_FILE_EXT
 from utils.load_corpus import load_corpus
 from utils.preprocess_corpus import TextPreprocessor
-
-from main import DATA_PATH
-
-EMBEDDINGS_PATH = 'word_embeddings'
-WORD_VECTOR_FILE_EXT = '.wordvectors'
 
 
 class MyCorpus:
@@ -71,11 +67,11 @@ def analyze_sentences(sentences):
     print('Sentence statistics')
     print(f'Mean: {sent_length_mean}')
     print("Counts:", sent_lengths)
-    print(sent_counts)
+    print(np.round(sent_counts / sent_count, 3))
     print('\nWord statistics')
     print(f'Mean: {word_length_mean}')
     print("Counts:", word_lengths)
-    print(word_counts)
+    print(np.round(word_counts / word_count, 3))
 
 
 if __name__ == '__main__':
@@ -83,7 +79,7 @@ if __name__ == '__main__':
 
     mask_symbol = '<mask>'
     folders = 'WIKIPEDIA'
-    data_file_name = 'wikipedia_climate.txt'
+    data_file_name = 'wikipedia_climate_small.txt'
     data_file_path = os.path.join(DATA_PATH, data_file_name)
 
     text_prepro = TextPreprocessor({'lower_case': True, 'min_words': 5, 'mask_symbol': mask_symbol,

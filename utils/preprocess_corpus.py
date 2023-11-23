@@ -82,6 +82,9 @@ class TextPreprocessor:
                 if len(word_tokens) >= self.min_words:
                     yield word_tokens
 
+    def tokenize_raw_sentences(self, sentences: List[str]):
+        return [self.w_tokenize(sent.lower() if self.lower_case else sent) for sent in sentences]
+
     def get_masked_word_tokens(self, sentences_tokenized: List[List[str]]):
         masked_sentences = []
         masked_word = []

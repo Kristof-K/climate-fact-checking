@@ -1,10 +1,10 @@
-from typing import Iterator
+from typing import Iterator, List
 import numpy as np
 import os
-from keras.models import model_from_json
+
 from keras.optimizers import Adam
 from keras.losses import SparseCategoricalCrossentropy
-from transformers import TFAutoModelForMaskedLM, TFDistilBertForMaskedLM
+from transformers import TFAutoModelForMaskedLM
 
 from models.masked_nlp_model import MaskedNLPModel
 from text_encoding.bert_tokenizers import MyBertTokenizer
@@ -60,15 +60,17 @@ class WrappedBert(MaskedNLPModel):
     def load_model(self, path, epoch):
         self.model.load_weights(os.path.join(path, f'model_{epoch}.h5'))
 
-    def get_token_probability(self, x_num: np.array, masked_word: str):
+    def get_token_probabilities(self, x_num: np.array, masked_words: List[str]):
         scores = self.model(x_num).logits.numpy()
-        masked_position = np.argwhere(x_num[0, :] == self.text_encoder.mask_token_id)[0, 0]
+        masked_position = np.apply_along_axis(lambda row: np.argwhere(row == self.text_encoder.mask_token_id)[0, 0],
+                                              1, x_num)
+        true_word_pos = [self.text_encoder.encode_one_y(token) for token in masked_words]
 
-        true_word = self.text_encoder.encode_one_y(masked_word)
-
-        return scores[0, masked_position, true_word]
+        return scores[((i, masked_position[i], true_word_pos) for i in range(x_num.shape[0]))]
 
     def get_most_likely_words(self, x_num: np.array, n_beams: int = 5):
+        # assume x_num has batch dimension 1
+
         scores = self.model(x_num).logits.numpy()
         masked_position = np.argwhere(x_num[0, :] == self.text_encoder.mask_token_id)[0, 0]
         k_largest = np.argsort(-1.0 * scores[0, masked_position, :])[:n_beams]

@@ -1,4 +1,4 @@
-from typing import Iterator
+from typing import Iterator, List
 import numpy as np
 import os
 from keras.models import Model, model_from_json
@@ -42,15 +42,17 @@ class MaskedWordModel(MaskedNLPModel):
         self.model = model_from_json(json_string)
         self.model.load_weights(os.path.join(path, f'model_{epoch}.h5'))
 
-    def get_token_probability(self, x_num: np.array, masked_word: str):
+    def get_token_probabilities(self, x_num: np.array, masked_word: List[str]):
         probs = self.model.predict(x_num, verbose=0)
 
-        if masked_word in self.text_encoder.word_vectors:
-            return probs[0, self.text_encoder.word_to_index[masked_word]]
-        # else return negative number
-        return -1.0
+        return np.array(
+            [probs[i, self.text_encoder.word_to_index[masked_word[i]]]
+             if masked_word[i] in self.text_encoder.word_vectors
+             else -1.0 for i in range(len(masked_word))]
+        )
 
     def get_most_likely_words(self, x_num: np.array, n_beams: int = 5):
+        # expect x_num has batch dimension 1
         probs = self.model.predict(x_num, verbose=0)
         k_largest = np.argsort(-1.0 * probs[0, :])[:n_beams]
 

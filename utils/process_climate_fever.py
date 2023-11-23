@@ -1,10 +1,10 @@
 import pandas as pd
 import os
 
-from main import DATA_PATH
+from constants import DATA_PATH
 
 
-def label_statements():
+def get_claims_and_labels():
     # go through statements and derive whether they are true or not
     data_df = pd.read_json(os.path.join(DATA_PATH, 'climate-fever.jsonl'), lines=True)
     n_rows = data_df.shape[0]

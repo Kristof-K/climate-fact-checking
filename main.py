@@ -4,14 +4,13 @@ import os
 import shutil   # to copy files
 import numpy as np
 
+from constants import DATA_PATH, CONFIG_FILE, MODEL_PATH
 from utils.load_corpus import load_corpus
 from utils.preprocess_corpus import TextPreprocessor
+from utils.process_climate_fever import get_claims_and_labels
 from text_encoding.get_encoder import get_encoder
 from models.get_model import get_model
-
-CONFIG_FILE = os.path.join('config', 'run.yaml')
-MODEL_PATH = os.path.join('models', 'saved_models')
-DATA_PATH = os.path.join('data')
+from utils.test_models import comprehensive_testing
 
 
 def create_folder(model_name: str):
@@ -82,7 +81,7 @@ if __name__ == '__main__':
     text_embedding = get_encoder(config['preprocessing'])
     text_embedding.learn_encoding(text_prepro.get_sent_generator())
     num_tokens = text_prepro.get_num_of_tokens()
-    print(f'Corpus comprises {num_tokens} climate statements')
+    print(f'Corpus comprises {num_tokens} training climate statements')
 
     # train or load the model ----------------------------------------------------------------
     model = get_model(text_embedding, config['model_training'])
@@ -95,8 +94,8 @@ if __name__ == '__main__':
         model.train(data_gen, steps=num_tokens // batch_size + 1, path=path)
 
     else:
-        model.load_model(path=os.path.join(MODEL_PATH, config['load_model']['folder']),
-                         epoch=config['load_model']['epoch'])
+        path = os.path.join(MODEL_PATH, config['load_model']['folder'])
+        model.load_model(path=path, epoch=config['load_model']['epoch'])
 
     # check performance on some of the training statements -----------------------------------
     pick = [13, 53, 100, 501, 1000]
@@ -111,10 +110,14 @@ if __name__ == '__main__':
         print(f'\n\n#{i}\n{" ".join(sent)}\n')
         for k in range(len(masked_words)):
             # keep batch dimension by using [k] instead of k
-            prob = model.get_token_probability(x_num[[k]], masked_words[k])
+            prob = model.get_token_probabilities(x_num[[k]], [masked_words[k]])
             most_likely, prob_ml = model.get_most_likely_words(x_num[[k]], n_beams=3)
-            print(f'{masked_words[k]} : {prob:.4f}')
+            print(f'{masked_words[k]} : {prob[0]:.4f}')
             print('vs. ', end='')
             for l in range(3):
                 print(f'{most_likely[l]} : {prob_ml[l]:.4f}, ', end='')
             print()
+
+        # check performance on climate-fever data --------------------------------------------------
+        claims, labels = get_claims_and_labels()
+        comprehensive_testing(model, text_embedding, text_prepro, claims, labels, path)
