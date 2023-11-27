@@ -16,17 +16,19 @@ def comprehensive_testing(model, text_embedding, text_preprocessor, claims, labe
     if not isinstance(claims[0], list):
         claims = text_preprocessor.tokenize_raw_sentences(claims)
 
-    # for the BERT models we have to batch process the predictions
-    n_claims = len(claims)
-    batch_size = 10     # model will see batch_size * sentence lengths due to the unfolding of masking!
-    claim_batches = [
-        [claims[i] for i in range(start, min(start + batch_size, n_claims))] for start in range(0, n_claims, batch_size)
-    ]
-    t_probs = [
-        get_probabilities(model, text_embedding, text_preprocessor, claim_batch) for claim_batch in claim_batches
-    ]
-    token_probabilities = list(chain.from_iterable(t_probs))
-    investigate_statements(token_probabilities, claims, labels, folder)
+    token_probabilities = get_probabilities_batched(model, text_embedding, text_preprocessor, claims, batch_size=10)
+
+    n_statements = 10
+    i_statements = np.arange(n_statements) * (len(claims) // (n_statements - 1))
+    # go through all statements and analyse them
+    for i in i_statements:
+        while np.all(np.isnan(token_probabilities[i])):
+            i += 1
+        most_likely_words, probs = get_most_likely_word_and_prob(model, text_embedding, text_preprocessor, claims[i])
+        plot_probability_as_line(token_probabilities[i], claims[i], labels[i], '_line_' + str(i), folder)
+        plot_probability_as_bars(token_probabilities[i], claims[i], probs, most_likely_words, labels[i],
+                                 '_bar_' + str(i), folder)
+
     investigate_probabilities(token_probabilities, labels, folder)
     investigate_probabilities(token_probabilities, labels, folder, normalize=False)
 
@@ -55,6 +57,31 @@ def get_probabilities(model, text_embedding, text_preprocessor, claims):
     return all_probabilities
 
 
+def get_probabilities_batched(model, text_embedding, text_preprocessor, claims, batch_size=10):
+    # model will see batch_size * sentence lengths due to the unfolding of masking!
+    n_claims = len(claims)
+    claim_batches = [
+        [claims[i] for i in range(start, min(start + batch_size, n_claims))] for start in range(0, n_claims, batch_size)
+    ]
+    t_probs = [
+        get_probabilities(model, text_embedding, text_preprocessor, claim_batch) for claim_batch in claim_batches
+    ]
+    token_probabilities = list(chain.from_iterable(t_probs))  # append all the list next to each other
+    return token_probabilities
+
+
+def get_most_likely_word_and_prob(model, text_embedding, text_preprocessor, claim):
+    if not text_embedding.sample_ok(claim):
+        return '', -1.0
+
+    masked_statements, masked_words = text_preprocessor.get_masked_word_tokens([claim])
+    x_num = text_embedding.encode_x(masked_statements)
+    res = [model.get_most_likely_words(x_num[[i]], n_beams=1) for i in range(x_num.shape[0])]
+    # unzip words and probabilities
+    unzipped = list(zip(*res))
+    return list(chain.from_iterable(unzipped[0])), np.concatenate(unzipped[1])     # return words and probabilities
+
+
 def plot_probability_as_line(probabilities, claim, label, add_name, folder):
     # determine x coordinates based on how long the tokens is, so that we can write the sentence
     # continuously on the x-axis and print the probabilities
@@ -64,10 +91,10 @@ def plot_probability_as_line(probabilities, claim, label, add_name, folder):
     x_vals = shifts + (token_lengths + 1) / 2
     plot_data = pd.DataFrame({'x': x_vals, 'y': probabilities})
 
-    plt.figure()
+    fig, ax = plt.subplots(figsize=(9, 4.5))
     sns.set_style('whitegrid')
     sns.despine(left=True)
-    g = sns.lineplot(x='x', y='y', data=plot_data)
+    g = sns.lineplot(x='x', y='y', data=plot_data, ax=ax)
     g.text(1, 0.9 * probabilities.max(), label)
     g.set_xticks(x_vals)
     g.set_xticklabels(labels=claim)
@@ -75,37 +102,38 @@ def plot_probability_as_line(probabilities, claim, label, add_name, folder):
     g.set_xlabel("")
     g.set_ylabel('Probability')
     g.set_title('Token Probabilities')
-    g.figure.set_size_inches(9, 4.5)
-    plt.savefig(os.path.join(folder, 'statement' + add_name + '.png'))
+    fig.savefig(os.path.join(folder, 'statement' + add_name + '.png'))
+    fig.clear()
     plt.close()
 
 
-def plot_probability_as_bars(probabilities, claim, label, add_name, folder):
-    # determine x coordinates based on how long the tokens is, so that we can write the sentence
-    # continuously on the x-axis and print the probabilities
-    plot_data = pd.DataFrame({'x': probabilities, 'y': claim})
+def plot_probability_as_bars(probabilities, claim, most_likely_p, most_likely_w, label, add_name, folder):
+    y_numbers = [str(i) for i in range(len(claim))]
+    plot_data = pd.DataFrame({'x': probabilities, 'y': y_numbers, 'x2': most_likely_p})
+    col_one = '#359DE3'
+    col_two = '#BB2C0B'
 
-    plt.figure(figsize=(4.5, 9))
+    fig, ax1 = plt.subplots(figsize=(4.5, 9))
     sns.set_style('whitegrid')
-    sns.despine(left=True)
-    g = sns.barplot(x='x', y='y', color='#359DE3', data=plot_data)
-    g.set_ylabel("")
+    sns.barplot(x='x2', y='y', color=col_two, data=plot_data, ax=ax1)
+    g = sns.barplot(x='x', y='y', color=col_one, data=plot_data, ax=ax1)
+    g.set_ylabel('')
+    ax1.tick_params(axis='y', labelcolor=col_one)
+    ax1.set_yticklabels(claim)
+    # add another y-axis for showing the most likely words
+    ax2 = ax1.twinx()
+    ax2.set_ylim(ax1.get_ylim())
+    ax2.set_yticks(ax1.get_yticks())
+    ax2.set_yticklabels(most_likely_w)
+    ax2.set_ylabel('')
+    ax2.tick_params(axis='y', labelcolor=col_two)
+
     g.set_xlabel('Probability / Score')
     g.set_title(f'Token Scores ({label})')
-    plt.tight_layout()
-    plt.savefig(os.path.join(folder, 'statement' + add_name + '.png'))
+    fig.tight_layout()
+    fig.savefig(os.path.join(folder, 'statement' + add_name + '.png'))
+    fig.clear()
     plt.close()
-
-
-def investigate_statements(all_probabilities, claims, labels, folder):
-    n_statements = 10
-    i_statements = np.arange(n_statements) * (len(claims) // (n_statements - 1))
-    # go through all statements and analyse them
-    for i in i_statements:
-        while np.all(np.isnan(all_probabilities[i])):
-            i += 1
-        plot_probability_as_line(all_probabilities[i], claims[i], labels[i], '_line_' + str(i), folder)
-        plot_probability_as_bars(all_probabilities[i], claims[i], labels[i], '_bar_' + str(i), folder)
 
 
 def plot_all_prob_curves(plot_data, folder, facet=False, add_name=''):
@@ -137,6 +165,7 @@ def plot_all_prob_curves(plot_data, folder, facet=False, add_name=''):
     fig.tight_layout()
     fig.savefig(os.path.join(folder, 'probability_plot' + add_name + '.png'))
     fig.clear()
+    plt.close()
 
 
 def investigate_probabilities(all_probabilities, labels, folder, normalize=True):
