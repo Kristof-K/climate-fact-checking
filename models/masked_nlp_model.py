@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Iterator
+from typing import Iterator, List
 import numpy as np
 import matplotlib.pyplot as plt
 import os
@@ -13,7 +13,7 @@ class MaskedNLPModel(ABC):
         pass
 
     @abstractmethod
-    def get_token_probability(self, x_num: np.array, masked_word: str):
+    def get_token_probabilities(self, x_num: np.array, masked_word: List[str]):
         pass
 
     @abstractmethod

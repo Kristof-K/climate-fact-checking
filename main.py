@@ -61,7 +61,7 @@ def get_training_data_generator(batch_size, text_prepro, text_embedding):
 
 if __name__ == '__main__':
     with open(CONFIG_FILE, 'r') as f:
-        config = yaml.safe_load(f)
+        config = yaml.safe_load(f) 
     # copy some attributes
     config['preprocessing']['model'] = config['model_training']['model']
     data_file = os.path.join(DATA_PATH, config['preprocessing']['data_file'])
@@ -118,6 +118,6 @@ if __name__ == '__main__':
                 print(f'{most_likely[l]} : {prob_ml[l]:.4f}, ', end='')
             print()
 
-        # check performance on climate-fever data --------------------------------------------------
-        claims, labels = get_claims_and_labels()
-        comprehensive_testing(model, text_embedding, text_prepro, claims, labels, path)
+    # check performance on climate-fever data -------------------------------------------------------
+    claims, labels = get_claims_and_labels()
+    comprehensive_testing(model, text_embedding, text_prepro, claims, labels, path)

@@ -66,7 +66,7 @@ class WrappedBert(MaskedNLPModel):
                                               1, x_num)
         true_word_pos = [self.text_encoder.encode_one_y(token) for token in masked_words]
 
-        return scores[((i, masked_position[i], true_word_pos) for i in range(x_num.shape[0]))]
+        return np.array([scores[i, masked_position[i], true_word_pos[i]] for i in range(x_num.shape[0])])
 
     def get_most_likely_words(self, x_num: np.array, n_beams: int = 5):
         # assume x_num has batch dimension 1
