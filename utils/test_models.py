@@ -176,13 +176,16 @@ def investigate_probabilities(all_probabilities, labels, folder, normalize=True)
         if np.all(np.isnan(all_probabilities[i])):
             continue
         n = probs.size
-        div = n - 1 if normalize else 1.0
+        div = n - 1 if normalize and n > 1 else 1.0
+        if div == 0:
+            print(f'{probs}: ')
         new_data = pd.DataFrame({'x': np.arange(n) / div,
                                  'y': np.sort(probs),
                                  'group': np.repeat(i, n),
                                  'label': np.repeat(labels[i], n)})
         plot_data = pd.concat((plot_data, new_data))
 
+    plot_data.index = np.arange(len(plot_data))
     add_name = '' if normalize else '_unscaled'
 
     plot_all_prob_curves(plot_data, folder, add_name=add_name)

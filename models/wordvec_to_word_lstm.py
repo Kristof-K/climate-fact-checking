@@ -3,6 +3,7 @@ from typing import List
 from keras.models import Model
 from keras.layers import Input, LSTM, Dense
 from keras.optimizers import RMSprop
+from keras.losses import CategoricalCrossentropy
 
 from models.masked_word_nlp_model import MaskedWordModel
 from text_encoding.word2vec import MyWord2Vec
@@ -33,6 +34,7 @@ class WordvecToWordLSTM(MaskedWordModel):
 
         model = Model(inputs=model_in, outputs=model_out)
         optimizer = RMSprop(learning_rate=learning_rate)
-        model.compile(optimizer=optimizer, loss='categorical_crossentropy')
+        loss_fn = CategoricalCrossentropy(from_logits=True)
+        model.compile(optimizer=optimizer, loss=loss_fn)
 
         super().__init__(model, text_encoder, batch_size=batch_size, epochs=epochs, save_epochs=save_epochs)

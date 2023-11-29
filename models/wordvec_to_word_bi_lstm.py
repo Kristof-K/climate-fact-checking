@@ -3,6 +3,7 @@ from typing import List
 from keras.models import Model
 from keras.layers import Input, LSTM, Dense, Bidirectional
 from keras.optimizers import RMSprop
+from keras.losses import CategoricalCrossentropy
 
 from models.masked_word_nlp_model import MaskedWordModel
 from text_encoding.word2vec import MyWord2Vec
@@ -24,7 +25,7 @@ class WordvecToWordBiLSTM(MaskedWordModel):
         # we cannot output sequences (arbitrary length!) as we want to process input further
         lstm_layers.append(Bidirectional(LSTM(num_neurons[-1], return_sequences=False)))
         # just process the intermediate state to make the prediction
-        model_dense = Dense(text_encoder.get_vocab_size(), activation='softmax')
+        model_dense = Dense(text_encoder.get_vocab_size())
 
         model_out = model_in
         for lstm_l in lstm_layers:
@@ -33,6 +34,7 @@ class WordvecToWordBiLSTM(MaskedWordModel):
 
         model = Model(inputs=model_in, outputs=model_out)
         optimizer = RMSprop(learning_rate=learning_rate)
-        model.compile(optimizer=optimizer, loss='categorical_crossentropy')
+        loss_fn = CategoricalCrossentropy(from_logits=True)
+        model.compile(optimizer=optimizer, loss=loss_fn)
 
         super().__init__(model, text_encoder, batch_size=batch_size, epochs=epochs, save_epochs=save_epochs)

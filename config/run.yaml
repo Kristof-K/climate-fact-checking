@@ -4,8 +4,8 @@ preprocessing:
   folders: "WIKIPEDIA"
   lower_case: True
   min_words: 5
-  mask_symbol: "[MASK]"
-  word_tokenizer: "DistilBERT"
+  mask_symbol: "<mask>"
+  word_tokenizer: "nltk"
   word_based: True
   # if word_based True maximal number of words per statement,
   # otherwise maximal number of characters
@@ -18,13 +18,13 @@ preprocessing:
   end_token: "\n"
 model_training:
   train: False
-  model: "distilbert-base-uncased"
-  epochs: 5
+  model: "WordvecToWordBiLSTM"
+  epochs: 10
   # save model weights every save_epochs iterations
   save_epochs: 1
-  learning_rate: 0.00001
+  learning_rate: 0.0001
   batch_size: 64
   num_neurons: [1024, 1024]
 load_model:
-  folder: "distilbert-base-uncased_2023-11-24_11-32"
-  epoch: 2
+  folder: "WordvecToWordBiLSTM_2023-11-28_09-18"
+  epoch: 10
